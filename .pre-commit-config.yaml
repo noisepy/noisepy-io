@@ -23,13 +23,13 @@ repos:
     - id: black
 
 
-  - repo: https://github.com/PyCQA/flake8
-    rev: 6.0.0
-    hooks:
-      - id: flake8
-        additional_dependencies:
-          - flake8-black
-        exclude: .git,__pycache__,build,dist
+  # - repo: https://github.com/PyCQA/flake8
+  #   rev: 6.0.0
+  #   hooks:
+  #     - id: flake8
+  #       additional_dependencies:
+  #         - flake8-black
+  #       exclude: .git,__pycache__,build,dist
 # repos:
 
 #     # Compare the local template version to the latest remote template version
