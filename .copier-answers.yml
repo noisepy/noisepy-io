@@ -1,0 +1,18 @@
+# Changes here will be overwritten by Copier
+_commit: v1.4.5
+_src_path: gh:lincc-frameworks/python-project-template
+author_email: ishikakhandelwal02@gmail.com
+author_name: Ishika Khandelwal
+create_example_module: false
+custom_install: true
+include_benchmarks: false
+include_docs: true
+include_notebooks: true
+mypy_type_checking: none
+package_name: noisepy-seis-io
+preferred_linter: black
+project_license: MIT
+project_name: noisepy-io
+project_organization: https://github.com/noisepy
+use_gitlfs: none
+use_isort: true
