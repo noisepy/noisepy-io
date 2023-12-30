@@ -50,7 +50,7 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools_scm]
-write_to = "src/noisepy_seis_io/_version.py"
+write_to = "src/noisepy/seis/io/_version.py"
 
 [tool.pytest.ini_options]
 testpaths = [
@@ -66,4 +66,4 @@ profile = "black"
 line_length = 110
 
 [tool.coverage.run]
-omit=["src/noisepy_seis_io/_version.py"]
+omit=["src/noisepy/seis/io/_version.py"]
