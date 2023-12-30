@@ -9,7 +9,7 @@ include_benchmarks: false
 include_docs: true
 include_notebooks: true
 mypy_type_checking: none
-package_name: noisepy-seis-io
+package_name: noisepy_seis_io
 preferred_linter: black
 project_license: MIT
 project_name: noisepy-io
