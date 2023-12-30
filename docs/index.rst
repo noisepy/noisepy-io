@@ -1,8 +1,8 @@
-.. noisepy_seis_io documentation main file.
+.. noisepy-seis-io documentation main file.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to noisepy_seis_io's documentation!
+Welcome to noisepy-seis-io's documentation!
 ========================================================================================
 
 Dev Guide - Getting Started

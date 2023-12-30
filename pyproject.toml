@@ -61,10 +61,14 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools_scm]
 <<<<<<< HEAD
+<<<<<<< HEAD
 write_to = "src/noisepy/seis/io/_version.py"
 =======
 write_to = "src/noisepy_seis_io/_version.py"
 >>>>>>> 8ddb812 (Instantiated the repo using LINCC template)
+=======
+write_to = "src/noisepy/seis/io/_version.py"
+>>>>>>> b291f6b (Instantiated the repo using LINCC template)
 
 [tool.pytest.ini_options]
 testpaths = [
@@ -81,7 +85,11 @@ line_length = 110
 
 [tool.coverage.run]
 <<<<<<< HEAD
+<<<<<<< HEAD
 omit=["src/noisepy/seis/io/_version.py"]
 =======
 omit=["src/noisepy_seis_io/_version.py"]
 >>>>>>> 8ddb812 (Instantiated the repo using LINCC template)
+=======
+omit=["src/noisepy/seis/io/_version.py"]
+>>>>>>> b291f6b (Instantiated the repo using LINCC template)
