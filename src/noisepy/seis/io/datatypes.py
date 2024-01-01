@@ -13,8 +13,7 @@ from urllib.parse import urlparse
 import numpy as np
 import obspy
 from pydantic import BaseModel, ConfigDict, Field
-
-# from pydantic.functional_validators import model_validator
+from pydantic.functional_validators import model_validator
 from pydantic_yaml import parse_yaml_raw_as, to_yaml_str
 
 from noisepy.seis.io.utils import get_filesystem, remove_nan_rows, remove_nans
@@ -273,7 +272,7 @@ class ConfigParameters(BaseModel):
             # self.stations = []
         return None
 
-    @classmethod(mode="after")
+    @model_validator(mode="after")
     def validate(cls, m: ConfigParameters) -> ConfigParameters:
         def validate_date(d: datetime, name: str):
             if d.tzinfo is None:
