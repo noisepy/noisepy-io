@@ -6,21 +6,14 @@ import pytest
 from datetimerange import DateTimeRange
 from obspy import UTCDateTime
 
-<<<<<<< HEAD
 from noisepy.seis.io.channelcatalog import (
     ChannelCatalog,
     CSVChannelCatalog,
     XMLStationChannelCatalog,
     stats2inv_mseed,
 )
-from noisepy.seis.io.datatypes import Channel, ChannelType, Station
 
-# from noisepy.seis.io.noise_module import stats2inv_mseed
-=======
-from noisepy.seis.io.channelcatalog import ChannelCatalog, CSVChannelCatalog, XMLStationChannelCatalog
 from noisepy.seis.io.datatypes import Channel, ChannelType, Station
-from noisepy.seis.io.noise_module import stats2inv_mseed
->>>>>>> 1b0c042 (Copied tests for numpystores.py and stores.py)
 
 chan_data = [("ARV", "BHE", 35.1269, -118.83009, 258.0), ("BAK", "BHZ", 35.34444, -119.10445, 116.0)]
 
