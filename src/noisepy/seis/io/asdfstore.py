@@ -9,7 +9,6 @@ import obspy
 import pyasdf
 from datetimerange import DateTimeRange
 
-# from . import noise_module
 from . import channelcatalog
 from .constants import PROGRESS_DATATYPE
 from .datatypes import Channel, ChannelData, ChannelType, CrossCorrelation, Stack, Station

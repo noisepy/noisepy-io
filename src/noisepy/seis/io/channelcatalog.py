@@ -9,9 +9,7 @@ import pandas as pd
 from datetimerange import DateTimeRange
 from obspy import UTCDateTime, read_inventory
 from obspy.clients.fdsn import Client
-from obspy.core.inventory import Channel as ch
-from obspy.core.inventory import Inventory, Network, Site
-from obspy.core.inventory import Station as st
+from obspy.core.inventory import Channel, Inventory, Network, Site, Station
 
 from .datatypes import Channel, Station
 from .utils import fs_join, get_filesystem
@@ -228,7 +226,7 @@ def stats2inv_mseed(stats, locs: pd.DataFrame) -> Inventory:
         start_date=stats.starttime,
     )
 
-    sta = st(
+    sta = obspy.core.inventory.Station(
         # This is the station code according to the SEED standard.
         code=locs.iloc[ista]["station"],
         latitude=locs.iloc[ista]["latitude"],
@@ -238,7 +236,7 @@ def stats2inv_mseed(stats, locs: pd.DataFrame) -> Inventory:
         site=Site(name="First station"),
     )
 
-    cha = ch(
+    cha = obspy.core.inventory.Channel(
         code=stats.channel,
         location_code=stats.location,
         latitude=locs.iloc[ista]["latitude"],
