@@ -182,7 +182,6 @@ class CSVChannelCatalog(ChannelCatalog):
         return obspy.Inventory(nets)
 
 
-
 def sta_info_from_inv(inv: obspy.core.inventory.inventory.Inventory):
     """
     this function outputs station info from the obspy inventory object
