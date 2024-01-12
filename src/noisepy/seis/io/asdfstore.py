@@ -9,7 +9,8 @@ import obspy
 import pyasdf
 from datetimerange import DateTimeRange
 
-from . import noise_module
+# from . import noise_module
+from . import channelcatalog
 from .constants import PROGRESS_DATATYPE
 from .datatypes import Channel, ChannelData, ChannelType, CrossCorrelation, Stack, Station
 from .stores import (
@@ -113,7 +114,7 @@ class ASDFRawDataStore(RawDataStore):
         try:
             with self.datasets[timespan] as ds:
                 inventory = ds.waveforms[name]["StationXML"]
-                sta, net, lon, lat, elv, loc = noise_module.sta_info_from_inv(inventory)
+                sta, net, lon, lat, elv, loc = channelcatalog.sta_info_from_inv(inventory)
                 return Station(net, sta, lat, lon, elv, loc)
         except Exception as e:
             logger.warning(f"Missing StationXML for station {name}. {e}")

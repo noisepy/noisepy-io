@@ -3,11 +3,15 @@ from abc import ABC, abstractmethod
 from functools import lru_cache
 
 import diskcache as dc
+import numpy as np
 import obspy
 import pandas as pd
 from datetimerange import DateTimeRange
 from obspy import UTCDateTime, read_inventory
 from obspy.clients.fdsn import Client
+from obspy.core.inventory import Channel as ch
+from obspy.core.inventory import Inventory, Network, Site
+from obspy.core.inventory import Station as st
 
 from .datatypes import Channel, Station
 from .utils import fs_join, get_filesystem
@@ -176,6 +180,129 @@ class CSVChannelCatalog(ChannelCatalog):
                 stations.append(station)
             nets.append(obspy.core.inventory.Network(net, stations))
         return obspy.Inventory(nets)
+
+
+def sta_info_from_inv(inv: obspy.core.inventory.inventory.Inventory):
+    """
+    this function outputs station info from the obspy inventory object
+    (used in S0B)
+    PARAMETERS:
+    ----------------------
+    inv: obspy inventory object
+    RETURNS:
+    ----------------------
+    sta: station name
+    net: netowrk name
+    lon: longitude of the station
+    lat: latitude of the station
+    elv: elevation of the station
+    location: location code of the station
+    """
+    # load from station inventory
+    sta = inv[0][0].code
+    net = inv[0].code
+    lon = inv[0][0].longitude
+    lat = inv[0][0].latitude
+    if inv[0][0].elevation:
+        elv = inv[0][0].elevation
+    else:
+        elv = 0.0
+
+    if inv[0][0][0].location_code:
+        location = inv[0][0][0].location_code
+    else:
+        location = "00"
+
+    return sta, net, lon, lat, elv, location
+
+
+def stats2inv_mseed(stats, locs: pd.DataFrame) -> Inventory:
+    inv = Inventory(networks=[], source="homegrown")
+    ista = locs[locs["station"] == stats.station].index.values.astype("int64")[0]
+
+    net = Network(
+        # This is the network code according to the SEED standard.
+        code=locs.iloc[ista]["network"],
+        stations=[],
+        description="created from SAC and resp files",
+        start_date=stats.starttime,
+    )
+
+    sta = st(
+        # This is the station code according to the SEED standard.
+        code=locs.iloc[ista]["station"],
+        latitude=locs.iloc[ista]["latitude"],
+        longitude=locs.iloc[ista]["longitude"],
+        elevation=locs.iloc[ista]["elevation"],
+        creation_date=stats.starttime,
+        site=Site(name="First station"),
+    )
+
+    cha = ch(
+        code=stats.channel,
+        location_code=stats.location,
+        latitude=locs.iloc[ista]["latitude"],
+        longitude=locs.iloc[ista]["longitude"],
+        elevation=locs.iloc[ista]["elevation"],
+        depth=-locs.iloc[ista]["elevation"],
+        azimuth=0,
+        dip=0,
+        sample_rate=stats.sampling_rate,
+    )
+
+    response = obspy.core.inventory.response.Response()
+
+    # Now tie it all together.
+    cha.response = response
+    sta.channels.append(cha)
+    net.stations.append(sta)
+    inv.networks.append(net)
+
+    return inv
+
+
+def cc_parameters(cc_para, coor, tcorr, ncorr, comp):
+    """
+    this function assembles the parameters for the cc function, which is used
+    when writing them into ASDF files
+    PARAMETERS:
+    ---------------------
+    cc_para: dict containing parameters used in the fft_cc step
+    coor:    dict containing coordinates info of the source and receiver stations
+    tcorr:   timestamp matrix
+    ncorr:   matrix of number of good segments for each sub-stack/final stack
+    comp:    2 character strings for the cross correlation component
+    RETURNS:
+    ------------------
+    parameters: dict containing above info used for later stacking/plotting
+    """
+    latS = coor["latS"]
+    lonS = coor["lonS"]
+    latR = coor["latR"]
+    lonR = coor["lonR"]
+    dt = cc_para["dt"]
+    maxlag = cc_para["maxlag"]
+    substack = cc_para["substack"]
+    cc_method = cc_para["cc_method"]
+
+    dist, azi, baz = obspy.geodetics.base.gps2dist_azimuth(latS, lonS, latR, lonR)
+    parameters = {
+        "dt": dt,
+        "maxlag": int(maxlag),
+        "dist": np.float32(dist / 1000),
+        "azi": np.float32(azi),
+        "baz": np.float32(baz),
+        "lonS": np.float32(lonS),
+        "latS": np.float32(latS),
+        "lonR": np.float32(lonR),
+        "latR": np.float32(latR),
+        "ngood": ncorr,
+        "cc_method": str(cc_method.value),
+        "time": tcorr,
+        "substack": substack,
+        "comp": comp,
+    }
+    return parameters
 
 
 # TODO: A channel catalog that uses the files in the SCEDC S3 bucket: s3://scedc-pds/FDSNstationXML/
