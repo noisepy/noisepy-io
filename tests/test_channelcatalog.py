@@ -6,7 +6,6 @@ import pytest
 from datetimerange import DateTimeRange
 from obspy import UTCDateTime
 
-
 from noisepy.seis.io.channelcatalog import (
     ChannelCatalog,
     CSVChannelCatalog,
