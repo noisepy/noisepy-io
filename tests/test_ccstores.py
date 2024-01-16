@@ -6,6 +6,9 @@ import numpy as np
 from datetimerange import DateTimeRange
 
 from noisepy.seis.io.asdfstore import ASDFCCStore
+
+# from noisepy.seis.io.noise_module import cc_parameters
+from noisepy.seis.io.channelcatalog import cc_parameters
 from noisepy.seis.io.datatypes import (
     Channel,
     ChannelType,
@@ -14,7 +17,6 @@ from noisepy.seis.io.datatypes import (
     Station,
     to_json_types,
 )
-from noisepy.seis.io.noise_module import cc_parameters
 from noisepy.seis.io.numpystore import NumpyCCStore
 from noisepy.seis.io.stores import CrossCorrelationDataStore
 from noisepy.seis.io.zarrstore import ZarrCCStore
