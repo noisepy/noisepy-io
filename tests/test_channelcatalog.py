@@ -14,8 +14,6 @@ from noisepy.seis.io.channelcatalog import (
 )
 from noisepy.seis.io.datatypes import Channel, ChannelType, Station
 
-# from noisepy.seis.io.noise_module import stats2inv_mseed
-
 chan_data = [("ARV", "BHE", 35.1269, -118.83009, 258.0), ("BAK", "BHZ", 35.34444, -119.10445, 116.0)]
 
 file = os.path.join(os.path.dirname(__file__), "./data/station.csv")
