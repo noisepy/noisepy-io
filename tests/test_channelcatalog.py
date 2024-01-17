@@ -12,7 +12,6 @@ from noisepy.seis.io.channelcatalog import (
     XMLStationChannelCatalog,
     stats2inv_mseed,
 )
-
 from noisepy.seis.io.datatypes import Channel, ChannelType, Station
 
 chan_data = [("ARV", "BHE", 35.1269, -118.83009, 258.0), ("BAK", "BHZ", 35.34444, -119.10445, 116.0)]
