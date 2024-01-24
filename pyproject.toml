@@ -3,7 +3,9 @@ name = "noisepy-io"
 license = {file = "LICENSE"}
 readme = "README.md"
 authors = [
-    { name = "Ishika Khandelwal", email = "ishikakhandelwal02@gmail.com" }
+    { email = "mdenolle@uw.edu", name = "Marine Denolle" },
+    { email = "carlosg@uw.edu", name = "Carlos Suarez" },
+    { email = "ishikakhandelwal02@gmail.com", name = "Ishika Khandelwal" },
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -47,9 +49,9 @@ dev = [
     "numpy", # Used in sample notebook intro_notebook.ipynb
 ]
 
-[metadata]
-long_description = { file = "README.md" }
-url = "https://github.com/https://github.com/noisepy/noisepy-io"
+
+[project.urls]
+Homepage = "https://github.com/noisepy/noisepy-io"
 
 [build-system]
 requires = [
