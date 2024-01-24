@@ -12,7 +12,7 @@ mypy_type_checking: none
 package_name: noisepy_seis_io
 preferred_linter: black
 project_license: MIT
-project_name: noisepy-io
+project_name: noisepy-seis-io
 project_organization: https://github.com/noisepy
 use_gitlfs: none
 use_isort: true

@@ -1,5 +1,5 @@
 [project]
-name = "noisepy-io"
+name = "noisepy-seis-io"
 license = {file = "LICENSE"}
 readme = "README.md"
 authors = [
