@@ -17,10 +17,10 @@ sys.path.insert(0, os.path.abspath("../src/"))
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = "noisepy-seis-io"
+project = "noisepy_seis_io"
 copyright = "2023, Ishika Khandelwal"
 author = "Ishika Khandelwal"
-release = version("noisepy-seis-io")
+release = version("noisepy_seis_io")
 # for example take major/minor
 version = ".".join(release.split(".")[:2])
 
