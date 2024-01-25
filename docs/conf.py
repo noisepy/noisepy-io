@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.abspath("../src/"))
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = "noisepy-seis-io"
+project = "noisepy-io"
 copyright = "2023, Ishika Khandelwal"
 author = "Ishika Khandelwal"
 release = version("noisepy-seis-io")
