@@ -1,5 +1,10 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
 [project]
 name = "noisepy_seis_io"
+dynamic = ["version"]
 license = {file = "LICENSE"}
 readme = "README.md"
 authors = [
@@ -15,7 +20,6 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python",
 ]
-dynamic = ["version"]
 dependencies = [
     "DateTimeRange>=2.0.0,<3.0.0",
     "numpy>=1.22.0,<2.0.0",
@@ -53,15 +57,22 @@ dev = [
 [project.urls]
 Homepage = "https://github.com/noisepy/noisepy-io"
 
-[build-system]
-requires = [
-    "setuptools>=62", # Used to build and package the Python project
-    "setuptools_scm>=6.2", # Gets release version from git. Makes it available programmatically
-]
-build-backend = "setuptools.build_meta"
+[tool.hatch.version]
+source = "vcs"
 
-[tool.setuptools_scm]
-write_to = "src/noisepy/seis/io/_version.py"
+[tool.hatch.build.hooks.vcs]
+version-file = "src/noisepy/seis/io/_version.py"
+
+[tool.hatch.version.raw-options]
+local_scheme = "no-local-version"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/noisepy",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/noisepy"]
 
 [tool.pytest.ini_options]
 testpaths = [
