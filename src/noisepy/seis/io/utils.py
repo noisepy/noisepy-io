@@ -4,19 +4,18 @@ import os
 import posixpath
 import time
 from concurrent.futures import Future
+from datetime import datetime, timezone
 from typing import Any, Callable, Iterable, List
 from urllib.parse import urlparse
 
 import fsspec
 import numpy as np
 import psutil
+from datetimerange import DateTimeRange
 from tqdm.autonotebook import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
 
 from noisepy.seis.io.constants import AWS_EXECUTION_ENV
-from datetime import datetime, timezone
-
-from datetimerange import DateTimeRange
 
 S3_SCHEME = "s3"
 FIND_RETRIES = 5
@@ -173,6 +172,7 @@ def remove_nan_rows(a: np.ndarray) -> np.ndarray:
     Remove rows from a 2D array that contain NaN values
     """
     return a[~np.isnan(a).any(axis=1)]
+
 
 def date_range(month: int, start_day: int, end_day: int, start_hr: int = 0, end_hr: int = 0):
     return DateTimeRange(

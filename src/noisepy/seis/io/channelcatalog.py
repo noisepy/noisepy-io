@@ -304,7 +304,8 @@ def cc_parameters(cc_para, coor, tcorr, ncorr, comp):
 
 
 # TODO: A channel catalog that uses the files in the SCEDC S3 bucket: s3://scedc-pds/FDSNstationXML/
-    
+
+
 class MockCatalog(ChannelCatalog):
     def get_full_channel(self, timespan: DateTimeRange, channel: Channel) -> Channel:
         return channel

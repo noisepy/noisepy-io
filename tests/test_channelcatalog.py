@@ -9,9 +9,9 @@ from obspy import UTCDateTime
 from noisepy.seis.io.channelcatalog import (
     ChannelCatalog,
     CSVChannelCatalog,
+    MockCatalog,
     XMLStationChannelCatalog,
     stats2inv_mseed,
-    MockCatalog
 )
 from noisepy.seis.io.datatypes import Channel, ChannelType, Station
 
@@ -28,9 +28,6 @@ def test_csv(stat: str, ch: str, lat: float, lon: float, elev: float):
     assert full_ch.station.lat == lat
     assert full_ch.station.lon == lon
     assert full_ch.station.elevation == elev
-
-
-
 
 
 @pytest.mark.parametrize("station,ch,lat,lon,elev", chan_data)
