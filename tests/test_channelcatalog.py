@@ -11,6 +11,7 @@ from noisepy.seis.io.channelcatalog import (
     CSVChannelCatalog,
     XMLStationChannelCatalog,
     stats2inv_mseed,
+    MockCatalog
 )
 from noisepy.seis.io.datatypes import Channel, ChannelType, Station
 
@@ -29,12 +30,7 @@ def test_csv(stat: str, ch: str, lat: float, lon: float, elev: float):
     assert full_ch.station.elevation == elev
 
 
-class MockCatalog(ChannelCatalog):
-    def get_full_channel(self, timespan: DateTimeRange, channel: Channel) -> Channel:
-        return channel
 
-    def get_inventory(self, timespan: DateTimeRange, station: Station) -> obspy.Inventory:
-        return obspy.Inventory()
 
 
 @pytest.mark.parametrize("station,ch,lat,lon,elev", chan_data)

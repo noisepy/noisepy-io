@@ -2,7 +2,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from utils import date_range
+from noisepy.seis.io.utils import date_range
 
 from noisepy.seis.io.asdfstore import ASDFStackStore
 from noisepy.seis.io.datatypes import Stack, Station

@@ -175,3 +175,7 @@ class SCEDCS3DataStore(RawDataStore):
             # lat/lon/elev will be populated later
             Station(network, station, location=location),
         )
+
+timespan1 = DateTimeRange(
+    datetime(2022, 1, 2, tzinfo=timezone.utc), datetime(2022, 1, 3, tzinfo=timezone.utc)
+)
