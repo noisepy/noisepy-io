@@ -175,4 +175,3 @@ class SCEDCS3DataStore(RawDataStore):
             # lat/lon/elev will be populated later
             Station(network, station, location=location),
         )
-

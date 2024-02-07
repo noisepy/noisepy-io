@@ -73,6 +73,7 @@ def test_XMLStationChannelCatalogCustomPath():
     assert len(yaq_inv) == 1
     assert len(yaq_inv.networks[0].stations) == 1
 
+
 class MockCatalog(ChannelCatalog):
     def get_full_channel(self, timespan: DateTimeRange, channel: Channel) -> Channel:
         return channel

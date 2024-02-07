@@ -6,6 +6,7 @@ from datetimerange import DateTimeRange
 from noisepy.seis.io.datatypes import Channel, ChannelData, Station
 from noisepy.seis.io.stores import RawDataStore
 
+
 class LocationChannelFilterStore(RawDataStore):
     """
     This 'store' simply wraps another store and filters out duplicate channels that differ only

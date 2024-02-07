@@ -68,11 +68,13 @@ def io_retry(func: Callable, *args, **kwargs) -> Any:
             utils_logger.warning(f"Retrying {func.__name__} after error: {e}. Retry {i} of {FIND_RETRIES}")
             time.sleep(FIND_RETRY_SLEEP * i)
 
+
 def date_range(month: int, start_day: int, end_day: int, start_hr: int = 0, end_hr: int = 0):
     return DateTimeRange(
         datetime(2021, month, start_day, start_hr).replace(tzinfo=timezone.utc),
         datetime(2021, month, end_day, end_hr).replace(tzinfo=timezone.utc),
     )
+
 
 class TimeLogger:
     """
@@ -177,5 +179,3 @@ def remove_nan_rows(a: np.ndarray) -> np.ndarray:
     Remove rows from a 2D array that contain NaN values
     """
     return a[~np.isnan(a).any(axis=1)]
-
-

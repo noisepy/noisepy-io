@@ -2,8 +2,10 @@ import os
 
 from test_channelcatalog import MockCatalog
 from test_scedc_s3store import timespan1
+
 from noisepy.seis.io.channel_filter_store import LocationChannelFilterStore
 from noisepy.seis.io.scedc_s3store import SCEDCS3DataStore
+
 
 def test_location_filtering():
     # This folder has 4 channel .ms files, 2 of which are the same channel, different location

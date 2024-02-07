@@ -9,7 +9,7 @@ from fsspec.implementations.local import LocalFileSystem  # noqa F401
 
 from noisepy.seis.io.hierarchicalstores import PairDirectoryCache
 from noisepy.seis.io.numpystore import NumpyArrayStore, NumpyCCStore
-from noisepy.seis.io.utils import FIND_RETRIES, io_retry,date_range
+from noisepy.seis.io.utils import FIND_RETRIES, date_range, io_retry
 from noisepy.seis.io.zarrstore import ZarrStoreHelper
 
 
