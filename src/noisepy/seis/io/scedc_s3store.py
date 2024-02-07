@@ -176,7 +176,3 @@ class SCEDCS3DataStore(RawDataStore):
             Station(network, station, location=location),
         )
 
-
-timespan1 = DateTimeRange(
-    datetime(2022, 1, 2, tzinfo=timezone.utc), datetime(2022, 1, 3, tzinfo=timezone.utc)
-)

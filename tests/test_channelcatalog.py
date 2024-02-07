@@ -9,7 +9,6 @@ from obspy import UTCDateTime
 from noisepy.seis.io.channelcatalog import (
     ChannelCatalog,
     CSVChannelCatalog,
-    MockCatalog,
     XMLStationChannelCatalog,
     stats2inv_mseed,
 )
@@ -73,3 +72,10 @@ def test_XMLStationChannelCatalogCustomPath():
     yaq_inv = cat.get_inventory(DateTimeRange(), Station("CI", "YAQ"))
     assert len(yaq_inv) == 1
     assert len(yaq_inv.networks[0].stations) == 1
+
+class MockCatalog(ChannelCatalog):
+    def get_full_channel(self, timespan: DateTimeRange, channel: Channel) -> Channel:
+        return channel
+
+    def get_inventory(self, timespan: DateTimeRange, station: Station) -> obspy.Inventory:
+        return obspy.Inventory()
