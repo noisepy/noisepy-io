@@ -2,7 +2,7 @@
 requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
-[project]
+
 name = "noisepy-seis-io"
 dynamic = ["version"]
 license = {file = "LICENSE"}
