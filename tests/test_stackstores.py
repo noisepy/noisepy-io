@@ -2,12 +2,12 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+from utils import date_range
 
 from noisepy.seis.io.asdfstore import ASDFStackStore
 from noisepy.seis.io.datatypes import Stack, Station
 from noisepy.seis.io.numpystore import NumpyStackStore
 from noisepy.seis.io.stores import StackStore
-from noisepy.seis.io.utils import date_range
 from noisepy.seis.io.zarrstore import ZarrStackStore
 
 
