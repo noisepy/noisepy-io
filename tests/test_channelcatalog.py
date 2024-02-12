@@ -29,6 +29,14 @@ def test_csv(stat: str, ch: str, lat: float, lon: float, elev: float):
     assert full_ch.station.elevation == elev
 
 
+class MockCatalog(ChannelCatalog):
+    def get_full_channel(self, timespan: DateTimeRange, channel: Channel) -> Channel:
+        return channel
+
+    def get_inventory(self, timespan: DateTimeRange, station: Station) -> obspy.Inventory:
+        return obspy.Inventory()
+
+
 @pytest.mark.parametrize("station,ch,lat,lon,elev", chan_data)
 def test_frominventory(station: str, ch: str, lat: float, lon: float, elev: float):
     file = os.path.join(os.path.dirname(__file__), "./data/station.csv")
@@ -72,11 +80,3 @@ def test_XMLStationChannelCatalogCustomPath():
     yaq_inv = cat.get_inventory(DateTimeRange(), Station("CI", "YAQ"))
     assert len(yaq_inv) == 1
     assert len(yaq_inv.networks[0].stations) == 1
-
-
-class MockCatalog(ChannelCatalog):
-    def get_full_channel(self, timespan: DateTimeRange, channel: Channel) -> Channel:
-        return channel
-
-    def get_inventory(self, timespan: DateTimeRange, station: Station) -> obspy.Inventory:
-        return obspy.Inventory()
