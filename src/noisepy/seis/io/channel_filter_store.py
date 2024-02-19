@@ -1,10 +1,12 @@
-from typing import Callable,List
+from typing import Callable, List
 
 import obspy
 from datetimerange import DateTimeRange
-from .constants import WILD_CARD
+
 from noisepy.seis.io.datatypes import Channel, ChannelData, Station
 from noisepy.seis.io.stores import RawDataStore
+
+from .constants import WILD_CARD
 
 
 class LocationChannelFilterStore(RawDataStore):
@@ -38,8 +40,11 @@ class LocationChannelFilterStore(RawDataStore):
             elif ch.type.location < min_chans[key].type.location:
                 min_chans[key] = ch
         return list(min_chans.values())
-    
-def channel_filter(net_list: List[str], sta_list: List[str], cha_list: List[str]) -> Callable[[Channel], bool]:
+
+
+def channel_filter(
+    net_list: List[str], sta_list: List[str], cha_list: List[str]
+) -> Callable[[Channel], bool]:
     stations = set(sta_list)
     networks = set(net_list)
     channels = set(cha_list)
