@@ -4,9 +4,9 @@ from datetime import datetime, timezone
 import pytest
 from datetimerange import DateTimeRange
 from test_channelcatalog import MockCatalog
-
+from noisepy.seis.io.channel_filter_store import channel_filter
 from noisepy.seis.io.datatypes import Channel, ChannelType, Station
-from noisepy.seis.io.scedc_s3store import SCEDCS3DataStore, channel_filter
+from noisepy.seis.io.scedc_s3store import SCEDCS3DataStore
 
 timespan1 = DateTimeRange(
     datetime(2022, 1, 2, tzinfo=timezone.utc), datetime(2022, 1, 3, tzinfo=timezone.utc)
@@ -71,7 +71,7 @@ def test_timespan_channels(store: SCEDCS3DataStore):
 
 def test_filter():
     # filter for station 'staX' or 'staY' and channel type starts with 'B'
-    f = channel_filter(["staX", "staY"], "B")
+    f = channel_filter(["CI"], ["staX", "staY"], ["BHE", "BBB"])
     staX = Station("CI", "staX")
     staZ = Station("CI", "staZ")
 
