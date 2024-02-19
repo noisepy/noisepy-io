@@ -142,7 +142,6 @@ class MiniSeedS3DataStore(RawDataStore):
     def _parse_timespan(self, filename: str) -> DateTimeRange:
         pass
 
-
 class SCEDCS3DataStore(MiniSeedS3DataStore):
     def __init__(
         self,
