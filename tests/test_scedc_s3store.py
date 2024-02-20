@@ -36,7 +36,6 @@ data_paths = [
     ("s3://scedc-pds/continuous_waveforms/", timespan1),
 ]
 
-
 read_channels = [
     (SCEDCS3DataStore._parse_channel(None, "BKTHIS_LHZ00_2022002.ms")),
     (SCEDCS3DataStore._parse_channel(None, "CIFOX2_LHZ___2022002.ms")),
