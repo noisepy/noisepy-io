@@ -6,7 +6,6 @@ from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 from typing import Callable, List
-
 import obspy
 from datetimerange import DateTimeRange
 
