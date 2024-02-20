@@ -3,7 +3,8 @@ import os
 from test_channelcatalog import MockCatalog
 from test_scedc_s3store import timespan1
 
-from noisepy.seis.io.channel_filter_store import LocationChannelFilterStore
+# from noisepy.seis.io.channel_filter_store import LocationChannelFilterStore
+from noisepy.seis.io.channel_filter_store import LocationChannelFilterStore,channel_filter
 from noisepy.seis.io.scedc_s3store import SCEDCS3DataStore
 
 
