@@ -5,7 +5,6 @@ import pytest
 from datetimerange import DateTimeRange
 from test_channelcatalog import MockCatalog
 
-# from noisepy.seis.io.channel_filter_store import channel_filter
 from noisepy.seis.io.channel_filter_store import channel_filter
 from noisepy.seis.io.datatypes import Channel, ChannelType, Station
 from noisepy.seis.io.scedc_s3store import SCEDCS3DataStore
@@ -36,7 +35,6 @@ data_paths = [
     ("s3://scedc-pds/continuous_waveforms/2022/2022_002/", None),
     ("s3://scedc-pds/continuous_waveforms/", timespan1),
 ]
-
 
 read_channels = [
     (SCEDCS3DataStore._parse_channel(None, "BKTHIS_LHZ00_2022002.ms")),
