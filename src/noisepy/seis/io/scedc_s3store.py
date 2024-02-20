@@ -18,6 +18,7 @@ from .utils import TimeLogger, fs_join, get_filesystem
 
 logger = logging.getLogger(__name__)
 
+
 class MiniSeedS3DataStore(RawDataStore):
     """
     A data store implementation to read from a directory of miniSEED (.ms) files from an S3 bucket.
@@ -141,6 +142,7 @@ class MiniSeedS3DataStore(RawDataStore):
     @abstractmethod
     def _parse_timespan(self, filename: str) -> DateTimeRange:
         pass
+
 
 class SCEDCS3DataStore(MiniSeedS3DataStore):
     def __init__(
