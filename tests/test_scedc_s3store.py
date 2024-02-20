@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 import pytest
 from datetimerange import DateTimeRange
 from test_channelcatalog import MockCatalog
+
 # from noisepy.seis.io.channel_filter_store import channel_filter
 from noisepy.seis.io.channel_filter_store import channel_filter
 from noisepy.seis.io.datatypes import Channel, ChannelType, Station

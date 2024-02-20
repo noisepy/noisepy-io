@@ -1,10 +1,12 @@
-from typing import Callable,List
+from typing import Callable, List
 
 import obspy
 from datetimerange import DateTimeRange
+
+from noisepy.seis.io.constants import WILD_CARD
 from noisepy.seis.io.datatypes import Channel, ChannelData, Station
 from noisepy.seis.io.stores import RawDataStore
-from noisepy.seis.io.constants import WILD_CARD
+
 
 class LocationChannelFilterStore(RawDataStore):
     """
