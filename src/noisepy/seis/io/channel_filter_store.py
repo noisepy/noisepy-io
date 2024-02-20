@@ -8,7 +8,6 @@ from noisepy.seis.io.stores import RawDataStore
 
 from .constants import WILD_CARD
 
-
 class LocationChannelFilterStore(RawDataStore):
     """
     This 'store' simply wraps another store and filters out duplicate channels that differ only

@@ -18,7 +18,6 @@ from .utils import TimeLogger, fs_join, get_filesystem
 
 logger = logging.getLogger(__name__)
 
-
 class MiniSeedS3DataStore(RawDataStore):
     """
     A data store implementation to read from a directory of miniSEED (.ms) files from an S3 bucket.
