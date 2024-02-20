@@ -40,7 +40,10 @@ class LocationChannelFilterStore(RawDataStore):
                 min_chans[key] = ch
         return list(min_chans.values())
 
-def channel_filter(net_list: List[str], sta_list: List[str], cha_list: List[str]) -> Callable[[Channel], bool]:
+
+def channel_filter(
+    net_list: List[str], sta_list: List[str], cha_list: List[str]
+) -> Callable[[Channel], bool]:
     stations = set(sta_list)
     networks = set(net_list)
     channels = set(cha_list)
