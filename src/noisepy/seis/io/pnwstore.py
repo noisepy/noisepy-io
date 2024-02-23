@@ -8,10 +8,10 @@ from typing import Callable, List, Tuple
 import obspy
 from datetimerange import DateTimeRange
 
-from noisepy.seis.io.channelcatalog import ChannelCatalog
-from noisepy.seis.io.datatypes import Channel, ChannelData, ChannelType, Station
-from noisepy.seis.io.stores import RawDataStore
-from noisepy.seis.io.utils import fs_join, get_filesystem
+from .channelcatalog import ChannelCatalog
+from .datatypes import Channel, ChannelData, ChannelType, Station
+from .stores import RawDataStore
+from .utils import fs_join, get_filesystem
 
 logger = logging.getLogger(__name__)
 
