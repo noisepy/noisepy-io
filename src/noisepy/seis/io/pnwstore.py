@@ -91,7 +91,9 @@ class PNWDataStore(RawDataStore):
         return list([DateTimeRange.from_range_text(d) for d in sorted(self.channels.keys())])
 
     def read_data(self, timespan: DateTimeRange, chan: Channel) -> ChannelData:
-        assert timespan.start_datetime.year == timespan.end_datetime.year, "Did not expect timespans to cross years"
+        assert (
+            timespan.start_datetime.year == timespan.end_datetime.year
+        ), "Did not expect timespans to cross years"
         year = timespan.start_datetime.year
         doy = str(timespan.start_datetime.timetuple().tm_yday).zfill(3)
 
@@ -113,7 +115,9 @@ class PNWDataStore(RawDataStore):
 
         # reconstruct the file name from the channel parameters
         chan_str = f"{chan.station.name}.{chan.station.network}.{timespan.start_datetime.strftime('%Y.%j')}"
-        filename = fs_join(self.paths[timespan.start_datetime].replace("__", chan.station.network), f"{chan_str}")
+        filename = fs_join(
+            self.paths[timespan.start_datetime].replace("__", chan.station.network), f"{chan_str}"
+        )
         if not self.fs.exists(filename):
             logger.warning(f"Could not find file {filename}")
             return ChannelData.empty()
