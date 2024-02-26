@@ -49,7 +49,9 @@ class _TileDBHelper:
         index = int(path)
         logger.debug(f"Appending to {path}: {data.shape}, index = {index}")
         if data.shape[0] < 9:
-            data = np.pad(data, ((0, 9 - data.shape[0]), (0, 0), (0, 0)), mode="constant", constant_values=np.nan)
+            data = np.pad(
+                data, ((0, 9 - data.shape[0]), (0, 0), (0, 0)), mode="constant", constant_values=np.nan
+            )
         with tiledb.open(self.arr_path, "w", ctx=self.ctx) as array:
             array[index] = data
             array.meta[path] = json.dumps(params)
