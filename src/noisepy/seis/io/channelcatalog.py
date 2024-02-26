@@ -179,7 +179,7 @@ class CSVChannelCatalog(ChannelCatalog):
                 station = inventory.Station(sta, lat, lon, elevation, channels=channels)
                 stations.append(station)
             nets.append(inventory.Network(net, stations))
-        return obspy.Inventory(nets)
+        return inventory.Inventory(nets)
 
 
 def sta_info_from_inv(inv: inventory.Inventory):
@@ -248,7 +248,7 @@ def stats2inv_sac(stats):
         start_date=stats.starttime,
     )
 
-    sta = Station(
+    sta = inventory.Station(
         # This is the station code according to the SEED standard.
         code=stats.station,
         latitude=stats.sac["stla"],
@@ -258,7 +258,7 @@ def stats2inv_sac(stats):
         site=inventory.Site(name="First station"),
     )
 
-    cha = Channel(
+    cha = inventory.Channel(
         # This is the channel code according to the SEED standard.
         code=stats.channel,
         # This is the location code according to the SEED standard.
@@ -272,7 +272,7 @@ def stats2inv_sac(stats):
         dip=stats.sac["cmpinc"],
         sample_rate=stats.sampling_rate,
     )
-    response = obspy.core.inventory.response.Response()
+    response = inventory.response.Response()
 
     # Now tie it all together.
     cha.response = response
