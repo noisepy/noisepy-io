@@ -1,4 +1,6 @@
+import glob
 import logging
+import os
 from abc import ABC, abstractmethod
 from functools import lru_cache
 
@@ -212,6 +214,73 @@ def sta_info_from_inv(inv: inventory.Inventory):
         location = "00"
 
     return sta, net, lon, lat, elv, location
+
+
+def stats2inv_staxml(stats, respdir: str) -> inventory.Inventory:
+    if not respdir:
+        raise ValueError("Abort! staxml is selected but no directory is given to access the files")
+    else:
+        invfilelist = glob.glob(os.path.join(respdir, "*" + stats.station + "*"))
+        if len(invfilelist) > 0:
+            invfile = invfilelist[0]
+            if len(invfilelist) > 1:
+                logger.warning(
+                    (
+                        "Warning! More than one StationXML file was found for station %s."
+                        + "Keeping the first file in list."
+                    )
+                    % stats.station
+                )
+            if os.path.isfile(str(invfile)):
+                inv = obspy.read_inventory(invfile)
+                return inv
+        else:
+            raise ValueError("Could not find a StationXML file for station: %s." % stats.station)
+
+
+def stats2inv_sac(stats):
+    inv = inventory.Inventory(networks=[], source="homegrown")
+    net = inventory.Network(
+        # This is the network code according to the SEED standard.
+        code=stats.network,
+        stations=[],
+        description="created from SAC and resp files",
+        start_date=stats.starttime,
+    )
+
+    sta = Station(
+        # This is the station code according to the SEED standard.
+        code=stats.station,
+        latitude=stats.sac["stla"],
+        longitude=stats.sac["stlo"],
+        elevation=stats.sac["stel"],
+        creation_date=stats.starttime,
+        site=inventory.Site(name="First station"),
+    )
+
+    cha = Channel(
+        # This is the channel code according to the SEED standard.
+        code=stats.channel,
+        # This is the location code according to the SEED standard.
+        location_code=stats.location,
+        # Note that these coordinates can differ from the station coordinates.
+        latitude=stats.sac["stla"],
+        longitude=stats.sac["stlo"],
+        elevation=stats.sac["stel"],
+        depth=-stats.sac["stel"],
+        azimuth=stats.sac["cmpaz"],
+        dip=stats.sac["cmpinc"],
+        sample_rate=stats.sampling_rate,
+    )
+    response = obspy.core.inventory.response.Response()
+
+    # Now tie it all together.
+    cha.response = response
+    sta.channels.append(cha)
+    net.stations.append(sta)
+    inv.networks.append(net)
+
+    return inv
 
 
 def stats2inv_mseed(stats, locs: pd.DataFrame) -> inventory.Inventory:
