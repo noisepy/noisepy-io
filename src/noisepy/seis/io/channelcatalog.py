@@ -5,11 +5,11 @@ from functools import lru_cache
 import diskcache as dc
 import numpy as np
 import obspy
+import obspy.core.inventory as inventory
 import pandas as pd
 from datetimerange import DateTimeRange
 from obspy import UTCDateTime, read_inventory
 from obspy.clients.fdsn import Client
-import obspy.core.inventory as inventory
 
 from .datatypes import Channel, Station
 from .utils import fs_join, get_filesystem
