@@ -9,7 +9,7 @@ import pandas as pd
 from datetimerange import DateTimeRange
 from obspy import UTCDateTime, read_inventory
 from obspy.clients.fdsn import Client
-from obspy.core.inventory import Channel, Inventory, Network, Site, Station
+import obspy.core.inventory as inventory
 
 from .datatypes import Channel, Station
 from .utils import fs_join, get_filesystem
@@ -171,16 +171,16 @@ class CSVChannelCatalog(ChannelCatalog):
                 lon = sta_row["longitude"]
                 elevation = sta_row["elevation"]
                 channels = [
-                    obspy.core.inventory.Channel(ch, "", lat, lon, elevation, 0)
+                    inventory.Channel(ch, "", lat, lon, elevation, 0)
                     for ch in df[df.network == net][df.station == sta]["channel"].values
                 ]
-                station = obspy.core.inventory.Station(sta, lat, lon, elevation, channels=channels)
+                station = inventory.Station(sta, lat, lon, elevation, channels=channels)
                 stations.append(station)
-            nets.append(obspy.core.inventory.Network(net, stations))
+            nets.append(inventory.Network(net, stations))
         return obspy.Inventory(nets)
 
 
-def sta_info_from_inv(inv: obspy.core.inventory.inventory.Inventory):
+def sta_info_from_inv(inv: inventory.Inventory):
     """
     this function outputs station info from the obspy inventory object
     (used in S0B)
@@ -214,11 +214,11 @@ def sta_info_from_inv(inv: obspy.core.inventory.inventory.Inventory):
     return sta, net, lon, lat, elv, location
 
 
-def stats2inv_mseed(stats, locs: pd.DataFrame) -> Inventory:
-    inv = Inventory(networks=[], source="homegrown")
+def stats2inv_mseed(stats, locs: pd.DataFrame) -> inventory.Inventory:
+    inv = inventory.Inventory(networks=[], source="homegrown")
     ista = locs[locs["station"] == stats.station].index.values.astype("int64")[0]
 
-    net = Network(
+    net = inventory.Network(
         # This is the network code according to the SEED standard.
         code=locs.iloc[ista]["network"],
         stations=[],
@@ -226,17 +226,17 @@ def stats2inv_mseed(stats, locs: pd.DataFrame) -> Inventory:
         start_date=stats.starttime,
     )
 
-    sta = obspy.core.inventory.Station(
+    sta = inventory.Station(
         # This is the station code according to the SEED standard.
         code=locs.iloc[ista]["station"],
         latitude=locs.iloc[ista]["latitude"],
         longitude=locs.iloc[ista]["longitude"],
         elevation=locs.iloc[ista]["elevation"],
         creation_date=stats.starttime,
-        site=Site(name="First station"),
+        site=inventory.Site(name="First station"),
     )
 
-    cha = obspy.core.inventory.Channel(
+    cha = inventory.Channel(
         code=stats.channel,
         location_code=stats.location,
         latitude=locs.iloc[ista]["latitude"],
@@ -248,7 +248,7 @@ def stats2inv_mseed(stats, locs: pd.DataFrame) -> Inventory:
         sample_rate=stats.sampling_rate,
     )
 
-    response = obspy.core.inventory.response.Response()
+    response = inventory.response.Response()
 
     # Now tie it all together.
     cha.response = response
