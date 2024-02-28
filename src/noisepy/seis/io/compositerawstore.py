@@ -19,7 +19,13 @@ class CompositeRawStore(RawDataStore):
         return [chan for store in self.stores.values() for chan in store.get_channels(timespan)]
 
     def get_timespans(self) -> List[DateTimeRange]:
-        return [timespan for store in self.stores.values() for timespan in store.get_timespans()]
+        timespans = dict([nets, store.get_timespans()] for nets, store in self.stores.items())
+        uniquespans = []
+        for netspans in timespans.values():
+            for span in netspans:
+                if span not in uniquespans:
+                    uniquespans.append(span)
+        return uniquespans
 
     def read_data(self, timespan: DateTimeRange, chan: Channel) -> ChannelData:
         return self._store(chan.station.network).read_data(timespan, chan)
