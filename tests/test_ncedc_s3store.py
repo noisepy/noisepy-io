@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 import pytest
 from datetimerange import DateTimeRange
 
-from noisepy.seis.io.scedc_s3store import NCEDCS3DataStore
+from noisepy.seis.io.s3store import NCEDCS3DataStore
 
 timespan1 = DateTimeRange(
     datetime(2022, 1, 2, tzinfo=timezone.utc), datetime(2022, 1, 3, tzinfo=timezone.utc)
