@@ -1,11 +1,8 @@
 # noisepy-seis-io
-
-[![Template](https://img.shields.io/badge/Template-LINCC%20Frameworks%20Python%20Project%20Template-brightgreen)](https://lincc-ppt.readthedocs.io/en/latest/)
-
-[![PyPI](https://img.shields.io/pypi/v/noisepy-io?color=blue&logo=pypi&logoColor=white)](https://pypi.org/project/noisepy-io/)
-[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/https://github.com/noisepy/noisepy-io/smoke-test.yml)](https://github.com/https://github.com/noisepy/noisepy-io/actions/workflows/smoke-test.yml)
-[![codecov](https://codecov.io/gh/https://github.com/noisepy/noisepy-io/branch/main/graph/badge.svg)](https://codecov.io/gh/https://github.com/noisepy/noisepy-io)
-[![Read the Docs](https://img.shields.io/readthedocs/noisepy-io)](https://noisepy-io.readthedocs.io/)
+[![PyPI](https://img.shields.io/pypi/v/noisepy-seis-io?color=blue&logo=pypi&logoColor=white)](https://pypi.org/project/noisepy-seis-io/)
+[![Build documentation](https://github.com/noisepy/noisepy-io/actions/workflows/build-documentation.yml/badge.svg)](https://github.com/noisepy/noisepy-io/actions/workflows/build-documentation.yml)
+[![codecov](https://codecov.io/gh/noisepy/noisepy-io/graph/badge.svg?token=3YIRLLXVmE)](https://codecov.io/gh/noisepy/noisepy-io)
+[![Read the Docs](https://img.shields.io/readthedocs/noisepy-io)](https://noisepy-seis-io.readthedocs.io/)
 
 This project was automatically generated using the LINCC-Frameworks
 [python-project-template](https://github.com/lincc-frameworks/python-project-template).
