@@ -194,25 +194,36 @@ class ASDFCCStore(CrossCorrelationDataStore):
 
 
 class ASDFStackStore(StackStore):
+    """
+    An ASDF Stack store bases class. The file organization is as follows, which is same as HierarchicalStoreBase.
+    /
+        src_sta/
+                rec_sta/
+                        timespan
+    """
+
     def __init__(self, directory: str, mode: str = "a"):
         super().__init__()
         self.datasets = ASDFDirectory(directory, mode, _filename_from_stations, _parse_station_pair_h5file)
 
-    # TODO: Do we want to support storing stacks from different timespans in the same store?
     def append(self, timespan: DateTimeRange, src: Station, rec: Station, stacks: List[Stack]):
         for stack in stacks:
-            self.datasets.add_aux_data((src, rec), stack.parameters, stack.name, stack.component, stack.data)
+            self.datasets.add_aux_data(
+                (src, rec, timespan), stack.parameters, stack.name, stack.component, stack.data
+            )
 
     def get_station_pairs(self) -> List[Tuple[Station, Station]]:
         return self.datasets.get_keys()
 
     def get_timespans(self, src: Station, rec: Station) -> List[DateTimeRange]:
-        # TODO: Do we want to support storing stacks from different timespans in the same store?
-        return []
+        h5files = sorted(
+            glob.glob(os.path.join(self.datasets.directory, f"{src}/{rec}/*.h5"), recursive=True)
+        )
+        return [parse_timespan(os.path.basename(i)) for i in h5files]
 
     def read(self, timespan: DateTimeRange, src: Station, rec: Station) -> List[Stack]:
         stacks = []
-        with self.datasets[(src, rec)] as ds:
+        with self.datasets[(src, rec, timespan)] as ds:
             for name in ds.auxiliary_data.list():
                 for component in ds.auxiliary_data[name].list():
                     stream = ds.auxiliary_data[name][component]
@@ -231,8 +242,8 @@ def _get_dataset(filename: str, mode: str) -> pyasdf.ASDFDataSet:
         return pyasdf.ASDFDataSet(filename, mode=mode, mpi=False, compression=None)
 
 
-def _filename_from_stations(pair: Tuple[Station, Station]) -> str:
-    return f"{pair[0]}/{pair[0]}_{pair[1]}.h5"
+def _filename_from_stations(pair: Tuple[Station, Station, DateTimeRange]) -> str:
+    return f"{pair[0]}/{pair[1]}/{timespan_str(pair[2])}.h5"
 
 
 def _filename_from_timespan(timespan: DateTimeRange) -> str:
@@ -240,8 +251,8 @@ def _filename_from_timespan(timespan: DateTimeRange) -> str:
 
 
 def _parse_station_pair_h5file(path: str) -> Tuple[Station, Station]:
-    pair = Path(path).stem
-    return parse_station_pair(pair)
+    src, rec = os.path.dirname(path).split(os.sep)[-2:]
+    return parse_station_pair(f"{src}_{rec}")
 
 
 def _parse_channel_path(path: str) -> Tuple[ChannelType, ChannelType]:

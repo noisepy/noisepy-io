@@ -126,3 +126,13 @@ def parse_timespan(filename: str) -> Optional[DateTimeRange]:
         return None
     dates = [obspy.UTCDateTime(p).datetime.replace(tzinfo=datetime.timezone.utc) for p in parts]
     return DateTimeRange(dates[0], dates[1])
+
+
+def convert_stackstore(
+    src_store: StackStore, rec_store: StackStore, timespan: DateTimeRange, src: Station, rec: Station
+):
+    stacks = src_store.read(timespan, src, rec)
+    if len(stacks) == 0:
+        pass
+    else:
+        rec_store.append(timespan, src, rec, stacks)
