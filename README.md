@@ -26,21 +26,45 @@ create and activate a new environment.
 ```
 
 Once you have created a new environment, you can install this project for local
-development using the following commands:
+development and below are the recommended steps for setting up your environment based on different installation scenarios:
+
+1. Installing from PyPI:
 
 ```
->> pip install -e .'[dev]'
+>> pip install noisepy-seis
+```
+If you're using pip install noisepy-seis to install the package directly from PyPI, all sources and dependencies will be placed in the appropriate site-packages directory. This setup is suitable for production environments and does not require additional setup for development.
+
+2. Installing in Editable mode:
+
+```
+>> pip install -e .[dev]
+```
+If you're cloning the noisepy-seis repository and installing the development version in editable mode (-e flag), you can follow these steps:
+
+- Clone the noisepy-seis repository from GitHub.
+- Install the package in editable mode by running pip install -e .[dev].
+- Any additional steps or workarounds specific to this scenario can be added here.
+
+3. Installing without Editable Mode:
+
+```
+>> pip install .[dev]
+```
+
+Install pre-commit hook and pandoc:
+
+```
 >> pre-commit install
 >> conda install pandoc
 ```
 
 Notes:
-1) The single quotes around `'[dev]'` may not be required for your operating system.
-2) `pre-commit install` will initialize pre-commit for this local repository, so
+1) `pre-commit install` will initialize pre-commit for this local repository, so
    that a set of tests will be run prior to completing a local commit. For more
    information, see the Python Project Template documentation on
    [pre-commit](https://lincc-ppt.readthedocs.io/en/latest/practices/precommit.html)
-3) Install `pandoc` allows you to verify that automatic rendering of Jupyter notebooks
+2) Install `pandoc` allows you to verify that automatic rendering of Jupyter notebooks
    into documentation for ReadTheDocs works as expected. For more information, see
    the Python Project Template documentation on
    [Sphinx and Python Notebooks](https://lincc-ppt.readthedocs.io/en/latest/practices/sphinx.html#python-notebooks)
