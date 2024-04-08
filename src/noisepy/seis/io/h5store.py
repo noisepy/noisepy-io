@@ -33,10 +33,11 @@ class DASH5DataStore:
     ):
         """
         Parameters:
-            path: path to look for ms files. Can be a local file directory or an s3://... url path
-            chan_catalog: ChannelCatalog to retrieve inventory information for the channels
-            channel_filter: Function to decide whether a channel should be used or not,
-                            if None, all channels are used
+            path: path to look for h5 files. Must be a local file directory
+            sampling_rate: sampling rate of the data
+            file_naming: a string format to parse the file name. Must contain a datetime format
+            channel_numbers: a list of channel numbers to read
+            array_name: name of the array
         """
         super().__init__()
         self.fs = get_filesystem(path, storage_options=storage_options)
