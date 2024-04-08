@@ -25,8 +25,8 @@ class DASH5DataStore:
         self,
         path: str,
         sampling_rate: int,
+        file_naming: str,
         channel_numbers: List[int],
-        file_naming: callable,
         array_name: str = "DAS",
         date_range: DateTimeRange = None,
         storage_options: dict = {},
@@ -134,24 +134,18 @@ class DASH5DataStore:
         )
 
     def _parse_timespan(self, filename: str) -> DateTimeRange:
-        # e.g., decimator2_2023-07-03_07.30.08_UTC.h5
-        year = int(filename[-26:-22])
-        month = int(filename[-21:-19])
-        day = int(filename[-18:-16])
-        hour = int(filename[-15:-13])
-        minute = int(filename[-12:-10])
-        second = int(filename[-9:-7])
-        starttime = datetime(year, month, day, hour, minute, second, tzinfo=timezone.utc)
-        return DateTimeRange(starttime, starttime + timedelta(minutes=1))  # one minute file
+        starttime = datetime.strptime(filename, self.file_naming).replace(tzinfo=timezone.utc)
+        return DateTimeRange(starttime, starttime + timedelta(minutes=1))  # assuming one minute file
 
     def _get_filename(self, timespan: DateTimeRange) -> str:
         filename = self.paths[timespan.start_datetime]
         return filename
 
     def _get_datepath(self, date: datetime) -> str:
-        return fs_join(self.path, self.file_naming(date))
+        return fs_join(self.path, datetime.strftime(date, self.file_naming))
 
     def _validate_station(self, station: Station):
+        # to pass Station.valid(), otherwise no channel is returned
         station.lat = 0.0
         station.lon = 0.0
         station.elevation = 0.0
