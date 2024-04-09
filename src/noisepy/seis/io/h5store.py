@@ -62,7 +62,6 @@ class DASH5DataStore(RawDataStore):
             for file in self.fs.glob(fs_join(self.path, "*.h5")):
                 print(file)
                 self._load_channels(file)
-            # TODO
 
     def _load_channels(self, full_path: str):
         tlog = TimeLogger(logger=logger, level=logging.INFO)
