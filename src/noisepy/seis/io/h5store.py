@@ -9,13 +9,15 @@ import h5py
 import obspy
 from datetimerange import DateTimeRange
 
+from noisepy.seis.io.stores import RawDataStore
+
 from .datatypes import Channel, ChannelData, ChannelType, Station
 from .utils import TimeLogger, fs_join, get_filesystem
 
 logger = logging.getLogger(__name__)
 
 
-class DASH5DataStore:
+class DASH5DataStore(RawDataStore):
     """
     A data store implementation to read from a directory of HDF5 (.h5) files.
     Every file is a minute recording and each .h5 file contains the data for all channel.
@@ -25,8 +27,8 @@ class DASH5DataStore:
         self,
         path: str,
         sampling_rate: int,
-        file_naming: str,
         channel_numbers: List[int],
+        file_naming: str = "%Y-%m-%d-%H-%M-%S.h5",
         array_name: str = "DAS",
         date_range: DateTimeRange = None,
         storage_options: dict = {},
@@ -45,7 +47,7 @@ class DASH5DataStore:
         self.array_name = array_name
         self.channel_numbers = channel_numbers
         self.file_naming = file_naming
-        self.path = path
+        self.path = os.path.abspath(path)
         self.paths = {}
         self.channels = defaultdict(list)
         if date_range is not None and date_range.start_datetime.tzinfo is None:
@@ -56,7 +58,11 @@ class DASH5DataStore:
         self.date_range = date_range
 
         if date_range is None:
-            self._load_channels(self.path)
+            print(fs_join(self.path, "*.h5"))
+            for file in self.fs.glob(fs_join(self.path, "*.h5")):
+                print(file)
+                self._load_channels(file)
+            # TODO
 
     def _load_channels(self, full_path: str):
         tlog = TimeLogger(logger=logger, level=logging.INFO)
@@ -66,11 +72,11 @@ class DASH5DataStore:
             timespan = self._parse_timespan(os.path.basename(f))
             self.paths[timespan.start_datetime] = full_path
             for idx in self.channel_numbers:
-                channel = self._parse_array(idx)
+                channel = self._parse_channel(idx)
                 key = str(timespan)  # DataTimeFrame is not hashable
                 self.channels[key].append(channel)
         tlog.log(
-            f"Init: {len(self.channels)} timespans and {sum(len(ch) for ch in  self.channels.values())} channels"
+            f"Init: {len(self.channels)} timespans and {len(set([str(i) for ch in self.channels.values() for i in ch]))} channels"
         )
 
     def _ensure_array_loaded(self, date_range: DateTimeRange):
@@ -127,7 +133,7 @@ class DASH5DataStore:
         data = ChannelData(stream)
         return data
 
-    def _parse_array(self, cha_numebr: int) -> Channel:
+    def _parse_channel(self, cha_numebr: int) -> Channel:
         cha_numebr = str(cha_numebr).zfill(5)
         return Channel(
             ChannelType("XXZ"),
