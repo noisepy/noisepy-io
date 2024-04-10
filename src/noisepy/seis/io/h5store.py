@@ -58,9 +58,7 @@ class DASH5DataStore(RawDataStore):
         self.date_range = date_range
 
         if date_range is None:
-            print(fs_join(self.path, "*.h5"))
             for file in self.fs.glob(fs_join(self.path, "*.h5")):
-                print(file)
                 self._load_channels(file)
 
     def _load_channels(self, full_path: str):
