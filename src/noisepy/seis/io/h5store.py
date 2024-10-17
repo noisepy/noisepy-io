@@ -1,6 +1,5 @@
 import logging
 import os
-import re
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from typing import List
@@ -9,9 +8,8 @@ import h5py
 import obspy
 from datetimerange import DateTimeRange
 
-from noisepy.seis.io.stores import RawDataStore
-
 from .datatypes import Channel, ChannelData, ChannelType, Station
+from .stores import RawDataStore
 from .utils import TimeLogger, fs_join, get_filesystem
 
 logger = logging.getLogger(__name__)

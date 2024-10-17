@@ -16,7 +16,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from pydantic.functional_validators import model_validator
 from pydantic_yaml import parse_yaml_raw_as, to_yaml_str
 
-from noisepy.seis.io.utils import get_filesystem, remove_nan_rows, remove_nans
+from .utils import get_filesystem, remove_nan_rows, remove_nans
 
 INVALID_COORD = -sys.float_info.max
 
@@ -149,11 +149,11 @@ class ConfigParameters(BaseModel):
     client_url_key: str = "SCEDC"
     start_date: datetime = Field(default=datetime(2019, 1, 1, tzinfo=timezone.utc))
     end_date: datetime = Field(default=datetime(2019, 1, 2, tzinfo=timezone.utc))
-    samp_freq: float = Field(default=20.0)  # TODO: change this samp_freq for the obspy "sampling_rate"
+    sampling_rate: float = Field(default=20.0)
     single_freq: bool = Field(
         default=True,
-        description="Filter to only data sampled at ONE frequency (the closest >= to samp_freq). "
-        "If False, it will use all data sample at >=samp_freq",
+        description="Filter to only data sampled at ONE frequency (the closest >= to sampling_rate). "
+        "If False, it will use all data sample at >=sampling_rate",
     )
 
     cc_len: int = Field(default=1800, description="basic unit of data length for fft (sec)")
@@ -247,7 +247,7 @@ class ConfigParameters(BaseModel):
 
     @property
     def dt(self) -> float:
-        return 1.0 / self.samp_freq
+        return 1.0 / self.sampling_rate
 
     def load_stations(self, stations_list=None) -> Optional[List[str]]:
         if stations_list is None and self.stations_file:

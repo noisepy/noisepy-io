@@ -12,11 +12,9 @@ import fsspec
 import numpy as np
 from datetimerange import DateTimeRange
 
-from noisepy.seis.io.utils import io_retry
-
 from .datatypes import AnnotatedData, Station
 from .stores import timespan_str
-from .utils import TimeLogger, fs_join, get_filesystem, unstack
+from .utils import TimeLogger, fs_join, get_filesystem, io_retry, unstack
 
 META_ATTR = "metadata"
 VERSION_ATTR = "version"

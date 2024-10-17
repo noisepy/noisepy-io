@@ -13,7 +13,7 @@ import psutil
 from tqdm.autonotebook import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
 
-from noisepy.seis.io.constants import AWS_EXECUTION_ENV
+from .constants import AWS_EXECUTION_ENV
 
 S3_SCHEME = "s3"
 HTTPS_SCHEME = "https"

@@ -24,42 +24,42 @@ class PNWDataStore(RawDataStore):
     def __init__(
         self,
         path: str,
-        chan_catalog: ChannelCatalog,
         db_file: str,
-        ch_filter: Callable[[Channel], bool] = None,
+        chan_catalog: ChannelCatalog,
+        chan_filter: Callable[[Channel], bool] = None,
         date_range: DateTimeRange = None,
     ):
         """
         Parameters:
             path: path to look for ms files. Can be a local file directory or an s3://... url path
-            chan_catalog: ChannelCatalog to retrieve inventory information for the channels
             db_file: path to the sqlite DB file
-            channel_filter: Optional function to decide whether a channel should be used or not,
+            chan_catalog: ChannelCatalog to retrieve inventory information for the channels
+            chan_filter: Optional function to decide whether a channel should be used or not,
                             if None, all channels are used
             date_range: Optional date range to filter the data
         """
         super().__init__()
         self.fs = get_filesystem(path)
-        self.channel_catalog = chan_catalog
+        self.chan_catalog = chan_catalog
         self.path = path
         self.db_file = db_file
         self.paths = {}
         # to store a dict of {timerange: list of channels}
         self.channels = {}
-        if ch_filter is None:
-            ch_filter = lambda s: True  # noqa: E731
+        if chan_filter is None:
+            chan_filter = lambda s: True  # noqa: E731
 
         if date_range is None:
-            self._load_channels(self.path, ch_filter)
+            self._load_channels(self.path, chan_filter)
         else:
             dt = date_range.end_datetime - date_range.start_datetime
             for d in range(0, dt.days):
                 date = date_range.start_datetime + timedelta(days=d)
                 date_path = str(date.year) + "/" + str(date.timetuple().tm_yday).zfill(3) + "/"
                 full_path = fs_join(self.path, date_path)
-                self._load_channels(full_path, ch_filter)
+                self._load_channels(full_path, chan_filter)
 
-    def _load_channels(self, full_path: str, ch_filter: Callable[[Channel], bool]):
+    def _load_channels(self, full_path: str, chan_filter: Callable[[Channel], bool]):
         # The path should look like: .../UW/2020/125/
         parts = full_path.split(os.path.sep)
         assert len(parts) >= 4
@@ -69,23 +69,22 @@ class PNWDataStore(RawDataStore):
             f"SELECT DISTINCT network, station, channel, location, filename "
             f"FROM tsindex WHERE filename LIKE '%%/{net}/{year}/{doy}/%%'"
         )
-        timespans = []
+
         for i in rst:
             timespan = PNWDataStore._parse_timespan(os.path.basename(i[4]))
             self.paths[timespan.start_datetime] = full_path
             channel = PNWDataStore._parse_channel(i)
-            if not ch_filter(channel):
+            if not chan_filter(channel):
                 continue
             key = str(timespan)
             if key not in self.channels:
-                timespans.append(timespan)
                 self.channels[key] = [channel]
             else:
                 self.channels[key].append(channel)
 
     def get_channels(self, timespan: DateTimeRange) -> List[Channel]:
         tmp_channels = self.channels.get(str(timespan), [])
-        return list(map(lambda c: self.channel_catalog.get_full_channel(timespan, c), tmp_channels))
+        return list(map(lambda c: self.chan_catalog.get_full_channel(timespan, c), tmp_channels))
 
     def get_timespans(self) -> List[DateTimeRange]:
         return list([DateTimeRange.from_range_text(d) for d in sorted(self.channels.keys())])
@@ -131,7 +130,7 @@ class PNWDataStore(RawDataStore):
         return ChannelData(stream)
 
     def get_inventory(self, timespan: DateTimeRange, station: Station) -> obspy.Inventory:
-        return self.channel_catalog.get_inventory(timespan, station)
+        return self.chan_catalog.get_inventory(timespan, station)
 
     def _parse_timespan(filename: str) -> DateTimeRange:
         # The PNWStore repository stores files in the form: STA.NET.YYYY.DOY
