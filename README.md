@@ -1,11 +1,8 @@
 # noisepy-seis-io
 [![PyPI](https://img.shields.io/pypi/v/noisepy-seis-io?color=blue&logo=pypi&logoColor=white)](https://pypi.org/project/noisepy-seis-io/)
-[![Build documentation](https://github.com/noisepy/noisepy-io/actions/workflows/build-documentation.yml/badge.svg)](https://github.com/noisepy/noisepy-io/actions/workflows/build-documentation.yml)
 [![codecov](https://codecov.io/gh/noisepy/noisepy-io/graph/badge.svg?token=3YIRLLXVmE)](https://codecov.io/gh/noisepy/noisepy-io)
 
-This project was automatically generated using the LINCC-Frameworks [python-project-template](https://github.com/lincc-frameworks/python-project-template).
-
-For more information about the project template see the
+This project was automatically generated using the LINCC-Frameworks [python-project-template](https://github.com/lincc-frameworks/python-project-template). For more information about the project template see the
 [documentation](https://lincc-ppt.readthedocs.io/en/latest/).
 
 ## Development Guide
