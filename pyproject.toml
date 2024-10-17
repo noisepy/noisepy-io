@@ -11,6 +11,7 @@ authors = [
     { email = "mdenolle@uw.edu", name = "Marine Denolle" },
     { email = "carlosg@uw.edu", name = "Carlos Suarez" },
     { email = "ishikakhandelwal02@gmail.com", name = "Ishika Khandelwal" },
+    { email = "niyiyu2uw.edu", name = "Yiyu Ni"}
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -83,7 +84,7 @@ testpaths = [
 
 [tool.black]
 line-length = 110
-target-version = ["py38"]
+target-version = ["py39"]
 
 [tool.isort]
 profile = "black"
