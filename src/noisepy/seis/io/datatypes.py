@@ -164,9 +164,9 @@ class ConfigParameters(BaseModel):
     lomin: float = Field(default=-122.0, description="Download: minimum longitude")
     lomax: float = Field(default=-115.0, description="Download: maximum longitude")
     down_list: bool = Field(default=False, description="download stations from a pre-compiled list or not")
-    net_list: List[str] = Field(default=["CI"], description="network list")
+    networks: List[str] = Field(default=["CI"], description="network list")
     stations: List[str] = Field(default=["*"], description="station list")
-    channels: List[str] = Field(default=["BHE", "BHN", "BHZ"], description="channel list")
+    channels: List[str] = Field(default=["*"], description="channel list")
     # pre-processing parameters
     step: float = Field(default=450.0, description="overlapping between each cc_len (sec)")
     freqmin: float = Field(default=0.05)
@@ -238,8 +238,6 @@ class ConfigParameters(BaseModel):
         description="Storage options to pass to fsspec, keyed by protocol (local files are ''))",
     )
 
-    stations_file: Optional[str] = Field(default=None)
-
     def get_storage_options(self, path: str) -> Dict[str, Any]:
         """The storage options for the given path"""
         url = urlparse(path)
@@ -249,28 +247,22 @@ class ConfigParameters(BaseModel):
     def dt(self) -> float:
         return 1.0 / self.sampling_rate
 
-    def load_stations(self, stations_list=None) -> Optional[List[str]]:
-        if stations_list is None and self.stations_file:
-            # Use get_filesystem to get the filesystem associated with the filename
-            fs = get_filesystem(self.stations_file, storage_options=self.storage_options)
+    def load_stations(self, from_file: str):
+        # Use get_filesystem to get the filesystem associated with the filename
+        fs = get_filesystem(from_file, storage_options=self.storage_options)
 
-            # Load the list from the file
-            with fs.open(self.stations_file, "r") as file:
-                self.stations = file.read().splitlines()
+        # Check if the file exists
+        if not fs.exists(from_file):
+            raise ValueError(f"{from_file} is not a valid stations file path.")
         else:
-            self.stations = stations_list
+            with fs.open(from_file, "r") as file:
+                self.stations = file.read().splitlines()
 
-        return self.stations if self.stations else None
-
-    def save_stations(self, value: List[str]):
-        if self.stations_file:
-            fs = get_filesystem(self.stations_file, storage_options=self.storage_options)
-            # Save the list to the file
-            with fs.open(self.stations_file, "w") as file:
-                file.write("\n".join(value) + "\n")
-            # Set stations field to Empty List
-            # self.stations = []
-        return None
+    def save_stations(self, to_file: str):
+        # Use get_filesystem to get the filesystem associated with the filename
+        fs = get_filesystem(to_file, storage_options=self.storage_options)
+        with fs.open(to_file, "w") as file:
+            file.write("\n".join(self.stations) + "\n")
 
     @model_validator(mode="after")
     def validate(cls, m: ConfigParameters) -> ConfigParameters:
@@ -284,13 +276,6 @@ class ConfigParameters(BaseModel):
         validate_date(m.end_date, "end_date")
         if m.substack_len % m.cc_len != 0:
             raise ValueError(f"substack_len ({m.substack_len}) must be a multiple of cc_len ({m.cc_len})")
-
-        if m.stations_file:
-            fs = get_filesystem(m.stations_file, storage_options=m.storage_options)
-
-            # Check if the file exists
-            if not fs.exists(m.stations_file):
-                raise ValueError(f"{m.stations_file} is not a valid file path in stations_file.")
 
         return m
 
