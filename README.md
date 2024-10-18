@@ -16,36 +16,31 @@ conda activate noisepy
 
 Once you have created a new environment, you can install this project for local development and below are the recommended steps for setting up your environment based on different installation scenarios:
 
-1. Installing from PyPI:
+- Installing from PyPI:
 
     ```
     pip install noisepy-seis
     ```
 
-If you're using pip install noisepy-seis to install the package directly from PyPI, all sources and dependencies will be placed in the appropriate site-packages directory. This setup is suitable for production environments and does not require additional setup for development.
+    If you're using pip install noisepy-seis to install the package directly from PyPI, all sources and dependencies will be placed in the appropriate site-packages directory. This setup is suitable for production environments and does not require additional setup for development.
 
-2. Installing in Editable mode:
+- Installing in Editable mode:
 
-    ```
-    pip install -e .[dev]
-    ```
+    If you're cloning the noisepy-seis repository and installing the development version in editable mode (`-e` flag), you can follow these steps:
 
-If you're cloning the noisepy-seis repository and installing the development version in editable mode (`-e` flag), you can follow these steps:
+    - Clone the noisepy-seis repository from GitHub `git clone git@github.com:noisepy/noisepy-io.git`.
+    - Install the package in editable mode by running `pip install -e .[dev]`.
 
-- Clone the noisepy-seis repository from GitHub.
-- Install the package in editable mode by running `pip install -e .[dev]`.
-- Any additional steps or workarounds specific to this scenario can be added here.
-
-3. Installing without Editable Mode:
+- Installing without Editable Mode:
 
     ```
     pip install .[dev]
     ```
 
-4. Install pre-commit hook:
+- Install pre-commit hook:
 
     ```
     pre-commit install
     ```
 
-Note that `pre-commit install` will initialize pre-commit for this local repository, so that a set of tests will be run prior to completing a local commit. For more information, see the Python Project Template documentation on [pre-commit](https://lincc-ppt.readthedocs.io/en/latest/practices/precommit.html).
+    Note that `pre-commit install` will initialize pre-commit for this local repository, so that a set of tests will be run prior to completing a local commit. For more information, see the Python Project Template documentation on [pre-commit](https://lincc-ppt.readthedocs.io/en/latest/practices/precommit.html).
