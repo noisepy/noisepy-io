@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import dateutil
@@ -66,3 +67,17 @@ def test_config_dates():
         c = ConfigParameters.model_validate(dict(c), strict=True)
     c.start_date = dateutil.parser.isoparse("2021-01-01T09:00:00+00:00")  # utc
     c = ConfigParameters.model_validate(dict(c), strict=True)
+
+
+stations = os.path.join(os.path.dirname(__file__), "./data/stations.txt")
+stations0 = os.path.join(os.path.dirname(__file__), "./data/stations0.txt")
+
+
+def test_load_stations():
+    c = ConfigParameters()
+
+    with pytest.raises(ValueError):
+        c.load_stations(stations0)
+
+    c.load_stations(stations)
+    assert c.stations == ["RPV", "SVD", "BBR"]
