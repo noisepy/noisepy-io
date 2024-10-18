@@ -10,10 +10,9 @@ from typing import Callable, List
 import obspy
 from datetimerange import DateTimeRange
 
-from noisepy.seis.io.channelcatalog import ChannelCatalog
-from noisepy.seis.io.stores import RawDataStore
-
+from .channelcatalog import ChannelCatalog
 from .datatypes import Channel, ChannelData, ChannelType, Station
+from .stores import RawDataStore
 from .utils import TimeLogger, fs_join, get_filesystem
 
 logger = logging.getLogger(__name__)
@@ -29,7 +28,7 @@ class MiniSeedS3DataStore(RawDataStore):
         self,
         path: str,
         chan_catalog: ChannelCatalog,
-        ch_filter: Callable[[Channel], bool] = lambda s: True,  # noqa: E731
+        chan_filter: Callable[[Channel], bool] = lambda s: True,  # noqa: E731
         date_range: DateTimeRange = None,
         file_name_regex: str = None,
         storage_options: dict = {},
@@ -38,18 +37,18 @@ class MiniSeedS3DataStore(RawDataStore):
         Parameters:
             path: path to look for ms files. Can be a local file directory or an s3://... url path
             chan_catalog: ChannelCatalog to retrieve inventory information for the channels
-            channel_filter: Function to decide whether a channel should be used or not,
+            chan_filter: Function to decide whether a channel should be used or not,
                             if None, all channels are used
         """
         super().__init__()
         self.file_re = re.compile(file_name_regex, re.IGNORECASE)
         self.fs = get_filesystem(path, storage_options=storage_options)
-        self.channel_catalog = chan_catalog
+        self.chan_catalog = chan_catalog
         self.path = path
         self.paths = {}
         # to store a dict of {timerange: list of channels}
         self.channels = defaultdict(list)
-        self.ch_filter = ch_filter
+        self.chan_filter = chan_filter
         if date_range is not None and date_range.start_datetime.tzinfo is None:
             start_datetime = date_range.start_datetime.replace(tzinfo=timezone.utc)
             end_datetime = date_range.end_datetime.replace(tzinfo=timezone.utc)
@@ -58,9 +57,9 @@ class MiniSeedS3DataStore(RawDataStore):
         self.date_range = date_range
 
         if date_range is None:
-            self._load_channels(self.path, ch_filter)
+            self._load_channels(self.path, chan_filter)
 
-    def _load_channels(self, full_path: str, ch_filter: Callable[[Channel], bool]):
+    def _load_channels(self, full_path: str, chan_filter: Callable[[Channel], bool]):
         tlog = TimeLogger(logger=logger, level=logging.INFO)
         msfiles = [f for f in self.fs.glob(fs_join(full_path, "*")) if self.file_re.match(f) is not None]
         tlog.log(f"Loading {len(msfiles)} files from {full_path}")
@@ -68,7 +67,7 @@ class MiniSeedS3DataStore(RawDataStore):
             timespan = self._parse_timespan(f)
             self.paths[timespan.start_datetime] = full_path
             channel = self._parse_channel(os.path.basename(f))
-            if not ch_filter(channel):
+            if not chan_filter(channel):
                 continue
             key = str(timespan)  # DataTimeFrame is not hashable
             self.channels[key].append(channel)
@@ -86,18 +85,16 @@ class MiniSeedS3DataStore(RawDataStore):
                     continue
                 date_path = self._get_datepath(date)
                 full_path = fs_join(self.path, date_path)
-                self._load_channels(full_path, self.ch_filter)
+                self._load_channels(full_path, self.chan_filter)
 
     def get_channels(self, date_range: DateTimeRange) -> List[Channel]:
         self._ensure_channels_loaded(date_range)
         tmp_channels = self.channels.get(str(date_range), [])
         executor = ThreadPoolExecutor()
         stations = set(map(lambda c: c.station, tmp_channels))
-        _ = list(executor.map(lambda s: self.channel_catalog.get_inventory(date_range, s), stations))
+        _ = list(executor.map(lambda s: self.chan_catalog.get_inventory(date_range, s), stations))
         logger.info(f"Getting {len(tmp_channels)} channels for {date_range}: {tmp_channels}")
-        return list(
-            executor.map(lambda c: self.channel_catalog.get_full_channel(date_range, c), tmp_channels)
-        )
+        return list(executor.map(lambda c: self.chan_catalog.get_full_channel(date_range, c), tmp_channels))
 
     def get_timespans(self) -> List[DateTimeRange]:
         if self.date_range is not None:
@@ -125,7 +122,7 @@ class MiniSeedS3DataStore(RawDataStore):
         return data
 
     def get_inventory(self, timespan: DateTimeRange, station: Station) -> obspy.Inventory:
-        return self.channel_catalog.get_inventory(timespan, station)
+        return self.chan_catalog.get_inventory(timespan, station)
 
     @abstractmethod
     def _get_datepath(self, timespan: datetime) -> str:
@@ -149,14 +146,14 @@ class SCEDCS3DataStore(MiniSeedS3DataStore):
         self,
         path: str,
         chan_catalog: ChannelCatalog,
-        ch_filter: Callable[[Channel], bool] = lambda s: True,  # noqa: E731
+        chan_filter: Callable[[Channel], bool] = lambda s: True,  # noqa: E731
         date_range: DateTimeRange = None,
         storage_options: dict = {},
     ):
         super().__init__(
             path,
             chan_catalog,
-            ch_filter=ch_filter,
+            chan_filter=chan_filter,
             date_range=date_range,
             # for checking the filename has the form: CIGMR__LHN___2022002.ms
             file_name_regex=r".*[0-9]{7}\.ms$",
@@ -203,14 +200,14 @@ class NCEDCS3DataStore(MiniSeedS3DataStore):
         self,
         path: str,
         chan_catalog: ChannelCatalog,
-        ch_filter: Callable[[Channel], bool] = lambda s: True,  # noqa: E731
+        chan_filter: Callable[[Channel], bool] = lambda s: True,  # noqa: E731
         date_range: DateTimeRange = None,
         storage_options: dict = {},
     ):
         super().__init__(
             path,
             chan_catalog,
-            ch_filter=ch_filter,
+            chan_filter=chan_filter,
             date_range=date_range,
             # for checking the filename has the form: AAS.NC.EHZ..D.2020.002
             file_name_regex=r".*[0-9]{4}.*[0-9]{3}$",

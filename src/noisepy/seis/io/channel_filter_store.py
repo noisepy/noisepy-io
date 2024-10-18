@@ -1,13 +1,12 @@
+import re
 from typing import Callable, List
 
 import obspy
 from datetimerange import DateTimeRange
 
-from noisepy.seis.io.constants import WILD_CARD
-from noisepy.seis.io.datatypes import Channel, ChannelData, Station
-from noisepy.seis.io.stores import RawDataStore
-
-from .constants import WILD_CARD
+from .constants import WILD_CARD_ANY, WILD_CARD_SINGLE
+from .datatypes import Channel, ChannelData, Station
+from .stores import RawDataStore
 
 
 class LocationChannelFilterStore(RawDataStore):
@@ -52,9 +51,19 @@ def channel_filter(
 
     def filter(ch: Channel) -> bool:
         return (
-            (WILD_CARD in stations or ch.station.name in stations)
-            and (WILD_CARD in networks or ch.station.network in networks)
-            and (WILD_CARD in channels or ch.type.name in channels)
+            match(ch.station.name, stations)
+            and match(ch.station.network, networks)
+            and match(ch.type.name, channels)
         )
+
+    def match(string: str, p: set) -> bool:
+        if WILD_CARD_ANY in p:
+            return True
+        else:
+            for i in p:
+                if bool(re.match(i.replace(WILD_CARD_SINGLE, ".").replace(WILD_CARD_ANY, ".*"), string)):
+                    return True
+            else:
+                return False
 
     return filter

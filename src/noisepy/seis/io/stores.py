@@ -9,10 +9,9 @@ from typing import Generic, List, Optional, Tuple, TypeVar
 import obspy
 from datetimerange import DateTimeRange
 
-from noisepy.seis.io.constants import DATE_FORMAT
-from noisepy.seis.io.utils import TimeLogger, get_results
-
+from .constants import DATE_FORMAT
 from .datatypes import AnnotatedData, Channel, ChannelData, CrossCorrelation, Stack, Station
+from .utils import TimeLogger, get_results
 
 
 class DataStore(ABC):

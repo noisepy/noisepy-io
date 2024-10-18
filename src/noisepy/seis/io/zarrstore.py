@@ -6,9 +6,9 @@ import numpy as np
 import zarr
 from datetimerange import DateTimeRange
 
-from noisepy.seis.io.datatypes import CrossCorrelation, Stack
-from noisepy.seis.io.hierarchicalstores import ArrayStore, HierarchicalStoreBase
-from noisepy.seis.io.stores import CrossCorrelationDataStore, StackStore, parse_timespan
+from .datatypes import CrossCorrelation, Stack
+from .hierarchicalstores import ArrayStore, HierarchicalStoreBase
+from .stores import CrossCorrelationDataStore, StackStore, parse_timespan
 
 logger = logging.getLogger(__name__)
 
