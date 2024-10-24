@@ -157,7 +157,7 @@ class ConfigParameters(BaseModel):
     )
 
     cc_len: int = Field(default=1800, description="basic unit of data length for fft (sec)")
-    # download params.
+
     # Targeted region/station information: only needed when down_list is False
     lamin: float = Field(default=31.0, description="Download: minimum latitude")
     lamax: float = Field(default=36.0, description="Download: maximum latitude")
@@ -175,8 +175,6 @@ class ConfigParameters(BaseModel):
         default=FreqNorm.RMA.value,
         description="choose between 'rma' for a soft whitenning or 'no' for no whitening",
     )
-    # TODO: change "no"for "None", and add "one_bit"as an option
-    # TODO: change time_norm option from "no"to "None"
     time_norm: TimeNorm = Field(
         default=TimeNorm.NO.value,
         description="'no' for no normalization, or 'rma', 'one_bit' for normalization in time domain,",
@@ -192,16 +190,13 @@ class ConfigParameters(BaseModel):
     smoothspect_N: int = Field(
         default=10, description="moving window length to smooth spectrum amplitude (points)"
     )
-    # if substack=True, substack_len=2*cc_len, then you pre-stack every 2 correlation windows.
-    # For instance: substack=True, substack_len=cc_len means that you keep ALL of the correlations"
+    # If substack=True, substack_windows=2, then you pre-stack every 2 correlation windows.
+    # For instance: substack=True, substack_windows=1 means that you keep ALL of the correlations"
     substack: bool = Field(
         default=False,
-        description="True:  smaller stacks within the time chunk. False: it will stack over inc_hours",
+        description="True: smaller stacks within the time chunk. False: it will stack over inc_hours",
     )
-    substack_len: int = Field(
-        default=1800,
-        description="how long to stack over (for monitoring purpose): need to be multiples of cc_len",
-    )
+    substack_windows: int = Field(default=1, description="How many windows of size cc_len to stack over.")
     maxlag: int = Field(default=200, description="lags of cross-correlation to save (sec)")
     inc_hours: int = Field(default=24, description="Time increment size in hours")
     # criteria for data selection
@@ -244,6 +239,10 @@ class ConfigParameters(BaseModel):
         return self.storage_options.get(url.scheme, {})
 
     @property
+    def substack_len(self) -> int:
+        return self.cc_len * self.substack_windows
+
+    @property
     def dt(self) -> float:
         return 1.0 / self.sampling_rate
 
@@ -274,8 +273,6 @@ class ConfigParameters(BaseModel):
 
         validate_date(m.start_date, "start_date")
         validate_date(m.end_date, "end_date")
-        if m.substack_len % m.cc_len != 0:
-            raise ValueError(f"substack_len ({m.substack_len}) must be a multiple of cc_len ({m.cc_len})")
 
         return m
 
