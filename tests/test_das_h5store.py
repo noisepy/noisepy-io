@@ -8,7 +8,6 @@ from datetime import datetime, timezone
 import pytest
 from datetimerange import DateTimeRange
 
-from noisepy.seis.io.datatypes import Channel
 from noisepy.seis.io.h5store import DASH5DataStore
 from noisepy.seis.io.stores import RawDataStore
 

@@ -5,7 +5,6 @@ from unittest import mock
 
 import pytest
 from datetimerange import DateTimeRange
-from fsspec.implementations.local import LocalFileSystem  # noqa F401
 from utils import date_range
 
 from noisepy.seis.io.hierarchicalstores import PairDirectoryCache

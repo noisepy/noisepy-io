@@ -22,9 +22,11 @@ def test_config_yaml(tmp_path: Path):
     file = str(tmp_path.joinpath("config.yaml"))
     c1 = ConfigParameters()
     ConfigParameters.validate(c1)
+    assert c1["substack_len"] == c1.cc_len * c1.substack_windows
     # change a couple of properties
     c1.step = 800
     c1.stack_method = StackMethod.ROBUST
+    c1.substack_windows = 10
     c1.save_yaml(file)
     c2 = ConfigParameters.load_yaml(file)
     assert c1 == c2
