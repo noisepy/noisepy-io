@@ -26,6 +26,7 @@ def test_config_yaml(tmp_path: Path):
     c1.step = 800
     c1.stack_method = StackMethod.ROBUST
     c1.substack_windows = 10
+    assert c1.substack_len == c1.cc_len * c1.substack_windows
     c1.save_yaml(file)
     c2 = ConfigParameters.load_yaml(file)
     assert c1 == c2
