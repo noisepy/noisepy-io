@@ -281,6 +281,8 @@ class ConfigParameters(BaseModel):
         # Hack since pydantic model properties are nor part of the object's __dict__
         if key == "dt":
             return self.dt
+        if key == "substack_len":
+            return self.substack_len
         return self.__dict__[key]
 
     def save_yaml(self, filename: str):
