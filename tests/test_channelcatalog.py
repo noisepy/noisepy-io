@@ -21,7 +21,7 @@ file = os.path.join(os.path.dirname(__file__), "./data/station.csv")
 
 
 @pytest.mark.parametrize("stat,ch,lat,lon,elev", chan_data)
-def test_csv(stat: str, ch: str, lat: float, lon: float, elev: float):
+def test_CSVChannelCatalog(stat: str, ch: str, lat: float, lon: float, elev: float):
     cat = CSVChannelCatalog(file)
     chan = Channel(ChannelType(ch), Station("CI", stat))
     full_ch = cat.get_full_channel(DateTimeRange(), chan)
@@ -85,6 +85,8 @@ def test_XMLStationChannelCatalogCustomPath():
 
 def test_FDSNStationChannelCatalog(tmp_path: str):
     cat = FDSNChannelCatalog("IRIS", tmp_path)
-    yaq_inv = cat.get_inventory(DateTimeRange(), Station("UW", "SEP"))
+    chan = Channel(ChannelType("BHZ"), Station("UW", "SEP"))
+    yaq_inv = cat.get_inventory(DateTimeRange(), chan.station)
     assert len(yaq_inv) == 1
     assert len(yaq_inv.networks[0].stations) == 1
+    _ = cat.get_full_channel(DateTimeRange(), chan)
