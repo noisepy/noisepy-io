@@ -93,7 +93,7 @@ class MiniSeedS3DataStore(RawDataStore):
         executor = ThreadPoolExecutor()
         stations = set(map(lambda c: c.station, tmp_channels))
         _ = list(executor.map(lambda s: self.chan_catalog.get_inventory(date_range, s), stations))
-        logger.info(f"Getting {len(tmp_channels)} channels for {date_range}: {tmp_channels}")
+        logger.info(f"Getting {len(tmp_channels)} channels for {date_range}")
         return list(executor.map(lambda c: self.chan_catalog.get_full_channel(date_range, c), tmp_channels))
 
     def get_timespans(self) -> List[DateTimeRange]:
