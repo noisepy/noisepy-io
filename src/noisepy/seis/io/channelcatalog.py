@@ -188,10 +188,10 @@ class CSVChannelCatalog(ChannelCatalog):
                 station = inventory.Station(sta, lat, lon, elevation, channels=channels)
                 stations.append(station)
             nets.append(inventory.Network(net, stations))
-        return inventory.Inventory(nets)
+        return obspy.Inventory(nets)
 
 
-def sta_info_from_inv(inv: inventory.Inventory):
+def sta_info_from_inv(inv: obspy.Inventory):
     """
     this function outputs station info from the obspy inventory object
     (used in S0B)
@@ -225,7 +225,7 @@ def sta_info_from_inv(inv: inventory.Inventory):
     return sta, net, lon, lat, elv, location
 
 
-def stats2inv_staxml(stats, respdir: str) -> inventory.Inventory:
+def stats2inv_staxml(stats, respdir: str) -> obspy.Inventory:
     if not respdir:
         raise ValueError("Abort! staxml is selected but no directory is given to access the files")
     else:
@@ -248,7 +248,7 @@ def stats2inv_staxml(stats, respdir: str) -> inventory.Inventory:
 
 
 def stats2inv_sac(stats):
-    inv = inventory.Inventory(networks=[], source="homegrown")
+    inv = obspy.Inventory(networks=[], source="homegrown")
     net = inventory.Network(
         # This is the network code according to the SEED standard.
         code=stats.network,
@@ -292,8 +292,8 @@ def stats2inv_sac(stats):
     return inv
 
 
-def stats2inv_mseed(stats, locs: pd.DataFrame) -> inventory.Inventory:
-    inv = inventory.Inventory(networks=[], source="homegrown")
+def stats2inv_mseed(stats, locs: pd.DataFrame) -> obspy.Inventory:
+    inv = obspy.Inventory(networks=[], source="homegrown")
     ista = locs[locs["station"] == stats.station].index.values.astype("int64")[0]
 
     net = inventory.Network(
