@@ -90,3 +90,7 @@ def test_FDSNStationChannelCatalog(tmp_path: str):
     assert len(yaq_inv) == 1
     assert len(yaq_inv.networks[0].stations) == 1
     _ = cat.get_full_channel(DateTimeRange(), chan)
+
+    chan = Channel(ChannelType("ABC"), Station("UW", "DEF"))
+    yaq_inv = cat.get_inventory(DateTimeRange(), chan.station)
+    assert len(yaq_inv) == 0
