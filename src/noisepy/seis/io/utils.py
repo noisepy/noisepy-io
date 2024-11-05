@@ -115,7 +115,7 @@ class TimeLogger:
 
     def log_raw(self, message: str, dt: float):
         if self.enabled:
-            self.logger.log(self.level, f"TIMING{self.prefix}: {dt:6.4f} secs. for {message}")
+            self.logger.log(self.level, f"TIMING{self.prefix}: {dt:6.3f} secs for {message}")
         return self.time
 
 
