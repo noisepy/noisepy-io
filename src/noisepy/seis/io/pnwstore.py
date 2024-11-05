@@ -2,6 +2,7 @@ import io
 import logging
 import os
 import sqlite3
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 from typing import Callable, List, Tuple
 
@@ -64,12 +65,18 @@ class PNWDataStore(RawDataStore):
         parts = full_path.split(os.path.sep)
         assert len(parts) >= 4
         net, year, doy = parts[-4:-1]
-
-        rst = self._dbquery(
+        cmd = (
             f"SELECT DISTINCT network, station, channel, location, filename "
-            f"FROM tsindex WHERE filename LIKE '%%/{net}/{year}/{doy}/%%'"
+            f"FROM tsindex WHERE filename LIKE '%%/{net}/{year}/{doy}/%%' "
+            "AND (channel LIKE '_H_' OR channel LIKE '_N_') "
         )
 
+        # if network is speficied, query will be faster
+        if net != "__":
+            cmd += f" AND network = '{net}'"
+        else:
+            logging.warning("Data path contains wildcards. Channel query might be slow.")
+        rst = self._dbquery(cmd)
         for i in rst:
             timespan = PNWDataStore._parse_timespan(os.path.basename(i[4]))
             self.paths[timespan.start_datetime] = full_path
@@ -82,9 +89,13 @@ class PNWDataStore(RawDataStore):
             else:
                 self.channels[key].append(channel)
 
-    def get_channels(self, timespan: DateTimeRange) -> List[Channel]:
-        tmp_channels = self.channels.get(str(timespan), [])
-        return list(map(lambda c: self.chan_catalog.get_full_channel(timespan, c), tmp_channels))
+    def get_channels(self, date_range: DateTimeRange) -> List[Channel]:
+        tmp_channels = self.channels.get(str(date_range), [])
+        executor = ThreadPoolExecutor()
+        stations = set(map(lambda c: c.station, tmp_channels))
+        _ = list(executor.map(lambda s: self.chan_catalog.get_inventory(date_range, s), stations))
+        logger.info(f"Getting {len(tmp_channels)} channels for {date_range}")
+        return list(executor.map(lambda c: self.chan_catalog.get_full_channel(date_range, c), tmp_channels))
 
     def get_timespans(self) -> List[DateTimeRange]:
         return list([DateTimeRange.from_range_text(d) for d in sorted(self.channels.keys())])

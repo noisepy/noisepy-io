@@ -21,3 +21,6 @@ coverage:
 
 # no comments in PRs
 comment: off
+
+ignore:
+  - "**/pnwstore.py"

@@ -62,7 +62,7 @@ class MiniSeedS3DataStore(RawDataStore):
     def _load_channels(self, full_path: str, chan_filter: Callable[[Channel], bool]):
         tlog = TimeLogger(logger=logger, level=logging.INFO)
         msfiles = [f for f in self.fs.glob(fs_join(full_path, "*")) if self.file_re.match(f) is not None]
-        tlog.log(f"Loading {len(msfiles)} files from {full_path}")
+        tlog.log(f"Listing {len(msfiles)} files from {full_path}")
         for f in msfiles:
             timespan = self._parse_timespan(f)
             self.paths[timespan.start_datetime] = full_path
@@ -93,7 +93,7 @@ class MiniSeedS3DataStore(RawDataStore):
         executor = ThreadPoolExecutor()
         stations = set(map(lambda c: c.station, tmp_channels))
         _ = list(executor.map(lambda s: self.chan_catalog.get_inventory(date_range, s), stations))
-        logger.info(f"Getting {len(tmp_channels)} channels for {date_range}: {tmp_channels}")
+        logger.info(f"Getting {len(tmp_channels)} channels for {date_range}")
         return list(executor.map(lambda c: self.chan_catalog.get_full_channel(date_range, c), tmp_channels))
 
     def get_timespans(self) -> List[DateTimeRange]:

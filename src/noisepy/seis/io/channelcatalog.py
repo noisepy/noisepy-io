@@ -1,6 +1,7 @@
 import glob
 import logging
 import os
+import time
 from abc import ABC, abstractmethod
 from functools import lru_cache
 
@@ -10,7 +11,7 @@ import obspy
 import obspy.core.inventory as inventory
 import pandas as pd
 from datetimerange import DateTimeRange
-from obspy import UTCDateTime, read_inventory
+from obspy import read_inventory
 from obspy.clients.fdsn import Client
 
 from .datatypes import Channel, Station
@@ -94,46 +95,54 @@ class XMLStationChannelCatalog(ChannelCatalog):
 
 class FDSNChannelCatalog(ChannelCatalog):
     """
-    A channel catalog that queries the FDSN service
+    A channel catalog that queries the FDSN web service
     FDSN ~ International Federation of Digital Seismograph Network
     """
 
-    def __init__(
-        self,
-        url_key: str,
-        cache_dir: str,
-    ):
+    def __init__(self, url_key: str, cache_dir: str, sleep_time: int = 10):
+        """
+        Constructs a FDSNChannelCatalog. A local directory will be used for inventory caching.
+
+        Args:
+            url_key (str): url key for obspy FDSN client, i.e., IRIS, SCEDC. See obspy.clients.fdsn
+            cache_dir (str): local database for metadata cache
+            sleep_time (int): give a random wait time for FDSN request
+        """
         super().__init__()
         self.url_key = url_key
+        self.sleep_time = sleep_time
 
-        logger.info(f"Cache dir: ${cache_dir}")
+        logger.info(f"Using FDSN service by {self.url_key}")
+        logger.info(f"Cache dir: {cache_dir}")
         self.cache = dc.Cache(cache_dir)
 
     def get_full_channel(self, timespan: DateTimeRange, channel: Channel) -> Channel:
-        inv = self._get_inventory(str(timespan))
+        inv = self._get_inventory(channel.station)
         return self.populate_from_inventory(inv, channel)
 
     def get_inventory(self, timespan: DateTimeRange, station: Station) -> obspy.Inventory:
-        return self._get_inventory(str(timespan))
-
-    def _get_cache_key(self, ts_str: str) -> str:
-        return f"{self.url_key}_{ts_str}"
+        return self._get_inventory(station)
 
     @lru_cache
-    # pass the timestamp (DateTimeRange) as string so that the method is cacheable
-    # since DateTimeRange is not hasheable
-    def _get_inventory(self, ts_str: str) -> obspy.Inventory:
-        ts = DateTimeRange.from_range_text(ts_str)
-        key = self._get_cache_key(ts_str)
-        inventory = self.cache.get(key, None)
+    def _get_inventory(self, station: Station) -> obspy.Inventory:
+        inventory = self.cache.get(str(station), None)  # check local cache
         if inventory is None:
-            logging.info(f"Inventory not found in cache for key: '{key}'. Fetching from {self.url_key}.")
-            bulk_station_request = [
-                ("*", "*", "*", "*", UTCDateTime(ts.start_datetime), UTCDateTime(ts.end_datetime))
-            ]
+            logging.info(f"Inventory not found in cache for '{station}'. Fetching from {self.url_key}.")
+            # Don't send request too fast
+            time.sleep(np.random.uniform(self.sleep_time))
             client = Client(self.url_key)
-            inventory = client.get_stations_bulk(bulk_station_request, level="channel")
-            self.cache[key] = inventory
+            try:
+                inventory = client.get_stations(
+                    network=station.network,
+                    station=station.name,
+                    location="*",
+                    channel="?H?,?N?",
+                    level="channel",
+                )
+            except obspy.clients.fdsn.header.FDSNNoDataException:
+                logger.warning(f"FDSN returns no data for {station}. Returning empty Inventory()")
+                inventory = obspy.Inventory()
+            self.cache[str(station)] = inventory
         return inventory
 
 
@@ -179,10 +188,10 @@ class CSVChannelCatalog(ChannelCatalog):
                 station = inventory.Station(sta, lat, lon, elevation, channels=channels)
                 stations.append(station)
             nets.append(inventory.Network(net, stations))
-        return inventory.Inventory(nets)
+        return obspy.Inventory(nets)
 
 
-def sta_info_from_inv(inv: inventory.Inventory):
+def sta_info_from_inv(inv: obspy.Inventory):
     """
     this function outputs station info from the obspy inventory object
     (used in S0B)
@@ -216,7 +225,7 @@ def sta_info_from_inv(inv: inventory.Inventory):
     return sta, net, lon, lat, elv, location
 
 
-def stats2inv_staxml(stats, respdir: str) -> inventory.Inventory:
+def stats2inv_staxml(stats, respdir: str) -> obspy.Inventory:
     if not respdir:
         raise ValueError("Abort! staxml is selected but no directory is given to access the files")
     else:
@@ -239,7 +248,7 @@ def stats2inv_staxml(stats, respdir: str) -> inventory.Inventory:
 
 
 def stats2inv_sac(stats):
-    inv = inventory.Inventory(networks=[], source="homegrown")
+    inv = obspy.Inventory(networks=[], source="homegrown")
     net = inventory.Network(
         # This is the network code according to the SEED standard.
         code=stats.network,
@@ -283,8 +292,8 @@ def stats2inv_sac(stats):
     return inv
 
 
-def stats2inv_mseed(stats, locs: pd.DataFrame) -> inventory.Inventory:
-    inv = inventory.Inventory(networks=[], source="homegrown")
+def stats2inv_mseed(stats, locs: pd.DataFrame) -> obspy.Inventory:
+    inv = obspy.Inventory(networks=[], source="homegrown")
     ista = locs[locs["station"] == stats.station].index.values.astype("int64")[0]
 
     net = inventory.Network(
@@ -370,6 +379,3 @@ def cc_parameters(cc_para, coor, tcorr, ncorr, comp):
         "comp": comp,
     }
     return parameters
-
-
-# TODO: A channel catalog that uses the files in the SCEDC S3 bucket: s3://scedc-pds/FDSNstationXML/

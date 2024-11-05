@@ -152,8 +152,10 @@ class ConfigParameters(BaseModel):
     sampling_rate: float = Field(default=20.0)
     single_freq: bool = Field(
         default=True,
-        description="Filter to only data sampled at ONE frequency (the closest >= to sampling_rate). "
-        "If False, it will use all data sample at >=sampling_rate",
+        description="Filter to only data sampled at ONE frequency (the closest >= to sampling_rate)."
+        " Mismatched frequencies will be dropped."
+        " If False, it will use all frequencies. "
+        " However, each station will still filter to only ONE frequency (the closest >= to sampling_rate)",
     )
 
     cc_len: int = Field(default=1800, description="basic unit of data length for fft (sec)")
