@@ -293,7 +293,8 @@ class ConfigParameters(BaseModel):
         with fs.open(filename, "w") as f:
             f.write(yaml_str)
 
-    def load_yaml(filename: str, storage_options={}) -> ConfigParameters:
+    @classmethod
+    def load_yaml(self, filename: str, storage_options={}) -> ConfigParameters:
         fs = get_filesystem(filename, storage_options=storage_options)
         with fs.open(filename, "r") as f:
             yaml_str = f.read()
