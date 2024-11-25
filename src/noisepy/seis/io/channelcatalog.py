@@ -137,7 +137,7 @@ class FDSNChannelCatalog(ChannelCatalog):
                     station=station.name,
                     location="*",
                     channel="?H?,?N?",
-                    level="channel",
+                    level="response",
                 )
             except obspy.clients.fdsn.header.FDSNNoDataException:
                 logger.warning(f"FDSN returns no data for {station}. Returning empty Inventory()")
