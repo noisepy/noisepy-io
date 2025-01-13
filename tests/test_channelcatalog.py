@@ -62,7 +62,8 @@ def test_frominventory(station: str, ch: str, lat: float, lon: float, elev: floa
     assert full_ch.station.elevation == elev
 
 
-xmlpaths = [os.path.join(os.path.dirname(__file__), "./data/"), "s3://scedc-pds/FDSNstationXML/CI/"]
+xmlpaths = [os.path.join(os.path.dirname(__file__), "./data/CI/"), "s3://scedc-pds/FDSNstationXML/CI/"]
+xmlpaths2 = os.path.join(os.path.dirname(__file__), "./data/")
 
 
 @pytest.mark.parametrize("path", xmlpaths)
@@ -76,9 +77,9 @@ def test_XMLStationChannelCatalog(path):
 
 
 def test_XMLStationChannelCatalogCustomPath():
-    # Check that a custom file name is also found properly, e.g. CI/CI.YAQ.xml
-    cat = XMLStationChannelCatalog(xmlpaths[0], "{network}" + os.path.sep + "{network}.{name}.xml")
-    yaq_inv = cat.get_inventory(DateTimeRange(), Station("CI", "YAQ"))
+    # Check that a custom file name is also found properly, e.g. BK/BK.WINE.xml
+    cat = XMLStationChannelCatalog(xmlpaths2, "{network}" + os.path.sep + "{network}.{name}.xml")
+    yaq_inv = cat.get_inventory(DateTimeRange(), Station("BK", "WINE"))
     assert len(yaq_inv) == 1
     assert len(yaq_inv.networks[0].stations) == 1
 
