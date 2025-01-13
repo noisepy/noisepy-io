@@ -28,7 +28,7 @@ class MiniSeedDataStore(RawDataStore):
         path: str,
         chan_catalog: ChannelCatalog,
         chan_filter: Callable[[Channel], bool] = None,
-        date_range: DateTimeRange = None
+        date_range: DateTimeRange = None,
     ):
         """
         Parameters:
