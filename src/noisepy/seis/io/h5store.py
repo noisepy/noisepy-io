@@ -96,7 +96,9 @@ class DASH5DataStore(RawDataStore):
 
     def get_timespans(self) -> List[DateTimeRange]:
         if self.date_range is not None:
-            minutes = int((self.date_range.end_datetime - self.date_range.start_datetime).total_seconds()) // 60
+            minutes = (
+                int((self.date_range.end_datetime - self.date_range.start_datetime).total_seconds()) // 60
+            )
             return [
                 DateTimeRange(
                     self.date_range.start_datetime.replace(tzinfo=timezone.utc) + timedelta(minutes=d),
