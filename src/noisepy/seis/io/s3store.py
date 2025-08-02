@@ -1,3 +1,4 @@
+import io
 import logging
 import os
 import re
@@ -115,9 +116,8 @@ class MiniSeedS3DataStore(RawDataStore):
         if not self.fs.exists(filename):
             logger.warning(f"Could not find file {filename}")
             return ChannelData.empty()
-
-        with self.fs.open(filename) as f:
-            stream = obspy.read(f)
+        buff = io.BytesIO(self.fs.read_bytes(filename))
+        stream = obspy.read(buff)
         data = ChannelData(stream)
         return data
 
@@ -215,8 +215,7 @@ class NCEDCS3DataStore(MiniSeedS3DataStore):
         )
 
     def _parse_channel(self, filename: str) -> Channel:
-        # e.g.
-        # AAS.NC.EHZ..D.2020.002
+        # e.g., AAS.NC.EHZ..D.2020.002
         split_fn = filename.split(".")
         network = split_fn[1]
         station = split_fn[0]
@@ -240,10 +239,62 @@ class NCEDCS3DataStore(MiniSeedS3DataStore):
     def _get_datepath(self, date: datetime) -> str:
         return str(date.year) + "/" + str(date.year) + "." + str(date.timetuple().tm_yday).zfill(3) + "/"
 
-    def _get_filename(self, timespan: DateTimeRange, chan: Channel) -> str:
+    def _get_filename(self, timespan: DateTimeRange, channel: Channel) -> str:
         chan_str = (
-            f"{chan.station.name}.{chan.station.network}.{chan.type.name}." f"{chan.station.location}.D"
+            f"{channel.station.name}.{channel.station.network}.{channel.type.name}."
+            f"{channel.station.location}.D"
         )
         return fs_join(
             self.paths[timespan.start_datetime], f"{chan_str}.{timespan.start_datetime.strftime('%Y.%j')}"
         )
+
+
+class EarthScopeS3DataStore(MiniSeedS3DataStore):
+    def __init__(
+        self,
+        path: str,
+        chan_catalog: ChannelCatalog,
+        chan_filter: Callable[[Channel], bool] = lambda s: True,  # noqa: E731
+        date_range: DateTimeRange = None,
+        storage_options: dict = {},
+    ):
+        super().__init__(
+            path,
+            chan_catalog,
+            chan_filter=chan_filter,
+            date_range=date_range,
+            # for checking the filename has the form: SHW.UW.2025.001#2
+            file_name_regex=r".*[0-9]{4}\.[0-9]{3}#[1-9]$",
+            storage_options=storage_options,
+        )
+
+    def _parse_channel(self, filename: str) -> Channel:
+        # e.g., SHW.UW.2025.001#2
+        station, network, year, dayv = filename.split(".")
+        version = dayv.split("#")[-1]
+        return Channel(
+            ChannelType("???", "???"),
+            # lat/lon/elev will be populated later
+            Station(network, station, location="???", version=version),
+        )
+
+    def _parse_timespan(self, filename: str) -> DateTimeRange:
+        # The EarthScope S3 bucket stores files in the form: SHW.UW.2025.001#2
+        fname = filename.split("/")[-1]
+        sta, net, year, dayv = fname.split(".")
+        day, v = dayv.split("#")
+        year = int(year)
+        day = int(day)
+        jan1 = datetime(year, 1, 1, tzinfo=timezone.utc)
+        return DateTimeRange(jan1 + timedelta(days=day - 1), jan1 + timedelta(days=day))
+
+    def _get_datepath(self, date: datetime) -> str:
+        return str(date.year) + "/" + str(date.timetuple().tm_yday).zfill(3) + "/"
+
+    def _get_filename(self, timespan: DateTimeRange, channel: Channel) -> str:
+        sta_str = f"{channel.station.name}.{channel.station.network}"
+        v = channel.station.version
+        filename = fs_join(
+            self.paths[timespan.start_datetime], f"{sta_str}.{timespan.start_datetime.strftime('%Y.%j')}#{v}"
+        )
+        return filename

@@ -65,6 +65,7 @@ class Station:
     lon: float
     elevation: float
     location: str
+    version: str
 
     def __init__(
         self,
@@ -74,6 +75,7 @@ class Station:
         lon: float = INVALID_COORD,
         elevation: float = INVALID_COORD,
         location: str = "",
+        version: str = "",
     ):
         self.network = network
         self.name = name
@@ -81,6 +83,7 @@ class Station:
         self.lon = lon
         self.elevation = elevation
         self.location = location
+        self.version = version
 
     def parse(sta: str) -> Optional[Station]:
         # Parse from: CI.ARV_CI.BAK

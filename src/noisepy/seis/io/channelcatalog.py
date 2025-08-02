@@ -45,6 +45,7 @@ class ChannelCatalog(ABC):
                 lon=inv_chan.longitude,
                 elevation=inv_chan.elevation,
                 location=ch.station.location,
+                version=ch.station.version,
             ),
         )
 
