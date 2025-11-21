@@ -68,6 +68,7 @@ class MiniSeedS3DataStore(RawDataStore):
             timespan = self._parse_timespan(f)
             self.paths[timespan.start_datetime] = full_path
             channel = self._parse_channel(os.path.basename(f))
+            print(channel)
             if not chan_filter(channel):
                 continue
             key = str(timespan)  # DataTimeFrame is not hashable
@@ -123,6 +124,9 @@ class MiniSeedS3DataStore(RawDataStore):
 
     def get_inventory(self, timespan: DateTimeRange, station: Station) -> obspy.Inventory:
         return self.chan_catalog.get_inventory(timespan, station)
+
+    def set_storage_options(self, storage_options):
+        self.fs.storage_options = storage_options
 
     @abstractmethod
     def _get_datepath(self, timespan: datetime) -> str:
@@ -280,7 +284,7 @@ class EarthScopeS3DataStore(MiniSeedS3DataStore):
 
     def _parse_timespan(self, filename: str) -> DateTimeRange:
         # The EarthScope S3 bucket stores files in the form: SHW.UW.2025.001#2
-        fname = filename.split("/")[-1]
+        fname = os.path.basename(filename)
         sta, net, year, dayv = fname.split(".")
         day, v = dayv.split("#")
         year = int(year)
@@ -289,7 +293,7 @@ class EarthScopeS3DataStore(MiniSeedS3DataStore):
         return DateTimeRange(jan1 + timedelta(days=day - 1), jan1 + timedelta(days=day))
 
     def _get_datepath(self, date: datetime) -> str:
-        return str(date.year) + "/" + str(date.timetuple().tm_yday).zfill(3) + "/"
+        return "/".join([str(date.year), str(date.timetuple().tm_yday).zfill(3), ""])
 
     def _get_filename(self, timespan: DateTimeRange, channel: Channel) -> str:
         sta_str = f"{channel.station.name}.{channel.station.network}"
