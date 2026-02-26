@@ -239,7 +239,7 @@ class HierarchicalStoreBase(Generic[T]):
     def append(self, timespan: DateTimeRange, src: Station, rec: Station, data: List[T]):
         path = self._get_path(src, rec, timespan)
         packed_data, metadata = AnnotatedData.pack(data)
-        tlog = TimeLogger(logger, logging.DEBUG)
+        tlog = TimeLogger(logger=logger, level=logging.DEBUG, prefix="APPEND")
         self.helper.append(path, {META_ATTR: metadata, VERSION_ATTR: 1.0}, packed_data)
         tlog.log(f"writing {len(data)} arrays to {path}")
         self.dir_cache.add(str(src), str(rec), [timespan])

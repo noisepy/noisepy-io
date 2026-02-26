@@ -60,9 +60,9 @@ class MiniSeedS3DataStore(RawDataStore):
             self._load_channels(self.path, chan_filter)
 
     def _load_channels(self, full_path: str, chan_filter: Callable[[Channel], bool]):
-        tlog = TimeLogger(logger=logger, level=logging.INFO)
+        tlog = TimeLogger(logger=logger, level=logging.DEBUG, prefix="LOAD CHANNELS")
         msfiles = [f for f in self.fs.glob(fs_join(full_path, "*")) if self.file_re.match(f) is not None]
-        tlog.log(f"Listing {len(msfiles)} files from {full_path}")
+        tlog.log(f"listing {len(msfiles)} files from {full_path}")
         for f in msfiles:
             timespan = self._parse_timespan(f)
             self.paths[timespan.start_datetime] = full_path
@@ -72,7 +72,7 @@ class MiniSeedS3DataStore(RawDataStore):
             key = str(timespan)  # DataTimeFrame is not hashable
             self.channels[key].append(channel)
         tlog.log(
-            f"Init: {len(self.channels)} timespans and {sum(len(ch) for ch in  self.channels.values())} channels"
+            f"loading {len(self.channels)} timespans and {sum(len(ch) for ch in  self.channels.values())} channels"
         )
 
     def _ensure_channels_loaded(self, date_range: DateTimeRange):

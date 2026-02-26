@@ -86,9 +86,9 @@ class ComputedDataStore(Generic[T]):
         """
         Reads the data for all the given station pairs (and timespan) in parallel.
         """
-        tlog = TimeLogger(level=logging.INFO)
+        tlog = TimeLogger(level=logging.DEBUG, prefix="READ BULK")
         futures = [executor.submit(self.read, timespan, p[0], p[1]) for p in pairs]
-        results = get_results(futures)
+        results = get_results(futures, "Reading data")
         tlog.log(f"loading {len(pairs)} stacks")
         return list(zip(pairs, results))
 
