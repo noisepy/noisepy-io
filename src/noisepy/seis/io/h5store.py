@@ -60,9 +60,9 @@ class DASH5DataStore(RawDataStore):
                 self._load_channels(file)
 
     def _load_channels(self, full_path: str):
-        tlog = TimeLogger(logger=logger, level=logging.INFO)
+        tlog = TimeLogger(logger=logger, level=logging.DEBUG, prefix="LOAD H5")
         msfiles = [f for f in self.fs.glob(full_path)]
-        tlog.log(f"Loading {len(msfiles)} files from {full_path}")
+        tlog.log(f"loading {len(msfiles)} files from {full_path}")
         for f in msfiles:
             timespan = self._parse_timespan(os.path.basename(f))
             self.paths[timespan.start_datetime] = full_path
@@ -71,7 +71,7 @@ class DASH5DataStore(RawDataStore):
                 key = str(timespan)  # DataTimeFrame is not hashable
                 self.channels[key].append(channel)
         tlog.log(
-            f"Init: {len(self.channels)} timespans and {len(set([str(i) for ch in self.channels.values() for i in ch]))} channels"
+            f"loading {len(self.channels)} timespans and {len(set([str(i) for ch in self.channels.values() for i in ch]))} channels"
         )
 
     def _ensure_array_loaded(self, date_range: DateTimeRange):
