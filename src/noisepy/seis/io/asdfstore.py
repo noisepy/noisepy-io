@@ -28,7 +28,7 @@ T = TypeVar("T")
 
 class ASDFDirectory(Generic[T]):
     """
-    Utility class used byt ASDFRawDataStore and ASDFCCStore to provide easy access
+    Utility class used by ASDFRawDataStore and ASDFCCStore to provide easy access
     to a set of ASDF files in a directory that follow a specific naming convention.
     The files are named after a generic type T (e.g. a timestamp or a pair of stations)
     so the constructor takes two functions to map between the type T and the corresponding
