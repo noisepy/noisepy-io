@@ -698,7 +698,7 @@ def plot_all_moveout(
 
     dt, maxlag = (params[p] for p in ["dt", "maxlag"])
     stack_method = stack_name.split("0")[-1]
-    logger.info(f"Plottting: {stack_method}, {len(sta_stacks)} station pairs")
+    logger.info(f"Plotting {len(sta_stacks)} pairs from {stack_method}")
 
     # lags for display
     if not disp_lag:

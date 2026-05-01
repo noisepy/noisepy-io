@@ -131,7 +131,7 @@ class ASDFCCStore(CrossCorrelationDataStore):
         station_pair = self._get_station_pair(src, rec)
         contains = self.datasets.contains(timespan, station_pair)
         if contains:
-            logger.info(f"Cross-correlation {station_pair} already exists")
+            logger.debug(f"Cross-correlation {station_pair} already exists")
         return contains
 
     def append(
