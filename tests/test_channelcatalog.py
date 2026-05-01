@@ -20,14 +20,19 @@ chan_data = [("ARV", "BHE", 35.1269, -118.83009, 258.0), ("BAK", "BHZ", 35.34444
 file = os.path.join(os.path.dirname(__file__), "./data/station.csv")
 
 
-@pytest.mark.parametrize("stat,ch,lat,lon,elev", chan_data)
-def test_CSVChannelCatalog(stat: str, ch: str, lat: float, lon: float, elev: float):
+@pytest.mark.parametrize("sta,cha,lat,lon,elev", chan_data)
+def test_CSVChannelCatalog(sta: str, cha: str, lat: float, lon: float, elev: float):
     cat = CSVChannelCatalog(file)
-    chan = Channel(ChannelType(ch), Station("CI", stat))
+    chan = Channel(ChannelType(cha), Station("CI", sta))
     full_ch = cat.get_full_channel(DateTimeRange(), chan)
     assert full_ch.station.lat == lat
     assert full_ch.station.lon == lon
     assert full_ch.station.elevation == elev
+
+    inv = cat.get_inventory(None, None)
+    content = inv.get_contents()
+    assert "CI" in content["networks"]
+    assert len(content["channels"]) == len(cat.df)
 
 
 class MockCatalog(ChannelCatalog):
