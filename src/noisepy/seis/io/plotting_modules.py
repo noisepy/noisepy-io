@@ -804,7 +804,7 @@ def plot_all_moveout_1D_1comp(
     ---------------------
     sfile: cross-correlation functions outputed by S2
     sta: source station name
-    dtype: datatype either 'Allstack0pws' or 'Allstack0linear'
+    dtype: datatype either 'Allstack_pws' or 'Allstack_linear'
     freqmin: min frequency to be filtered
     freqmax: max frequency to be filtered
     ccomp:   cross component
@@ -814,7 +814,7 @@ def plot_all_moveout_1D_1comp(
 
     USAGE:
     ----------------------
-    plot_substack_moveout('temp.h5','Allstack0pws',0.1,0.2,'ZZ',200,True,'./temp')
+    plot_substack_moveout('temp.h5','Allstack_pws',0.1,0.2,'ZZ',200,True,'./temp')
     """
     # open data for read
     if savefig:
@@ -909,7 +909,7 @@ def plot_all_moveout_1D_9comp(
     ---------------------
     sfile: cross-correlation functions outputed by S2
     sta: source station name
-    dtype: datatype either 'Allstack0pws' or 'Allstack0linear'
+    dtype: datatype either 'Allstack_pws' or 'Allstack_linear'
     freqmin: min frequency to be filtered
     freqmax: max frequency to be filtered
     mdist: maximum inter-station distance to show on plot
