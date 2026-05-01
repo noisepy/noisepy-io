@@ -21,6 +21,7 @@ def test_location_filtering():
     bkthis_chan = next(filter(lambda c: c.station.network == "BK", channels))
     assert bkthis_chan.type.location == "00"
 
+
 def test_filter():
     # filter for station 'staX' or 'staY' and channel type starts with 'B'
     f = channel_filter(["BK"], ["staX", "staY"], ["BHE", "BBB"])

@@ -62,8 +62,10 @@ def test_frominventory(station: str, ch: str, lat: float, lon: float, elev: floa
     assert full_ch.station.elevation == elev
 
 
-xmlpaths = [os.path.join(os.path.dirname(__file__), "./data/stationxml/CI/"), 
-            "s3://scedc-pds/FDSNstationXML/CI/"]
+xmlpaths = [
+    os.path.join(os.path.dirname(__file__), "./data/stationxml/CI/"),
+    "s3://scedc-pds/FDSNstationXML/CI/",
+]
 xmlpaths2 = os.path.join(os.path.dirname(__file__), "./data/stationxml/")
 
 

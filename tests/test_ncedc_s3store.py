@@ -48,6 +48,7 @@ def store(request):
     (path, timespan) = request.param
     return NCEDCS3DataStore(path, MockCatalog(), lambda ch: ch in read_channels, timespan, storage_options)
 
+
 @pytest.mark.parametrize("channel", read_channels)
 def test_read(store: NCEDCS3DataStore, channel: str):
     chdata = store.read_data(timespan1, channel)
@@ -56,6 +57,7 @@ def test_read(store: NCEDCS3DataStore, channel: str):
     assert chdata.start_timestamp >= timespan1.start_datetime.timestamp()
     assert chdata.start_timestamp < timespan1.end_datetime.timestamp()
     assert chdata.data.size > 0
+
 
 def test_timespan_channels(store: NCEDCS3DataStore):
     timespans = store.get_timespans()

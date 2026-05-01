@@ -62,7 +62,9 @@ class XMLStationChannelCatalog(ChannelCatalog):
     A channel catalog that reads <station>.XML files from a directory or an s3://... bucket url path.
     """
 
-    def __init__(self, xmlpath: str, path_format: str = "{network}_{station}.xml", storage_options={}) -> None:
+    def __init__(
+        self, xmlpath: str, path_format: str = "{network}_{station}.xml", storage_options={}
+    ) -> None:
         """
         Constructs a XMLStationChannelCatalog
 
