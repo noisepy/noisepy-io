@@ -18,7 +18,7 @@ def _make_stack(dt=0.05, maxlag=10.0, dist=5.0):
     return Stack(
         component="ZZ",
         name="Allstack_linear",
-        parameters={"dt": dt, "maxlag": maxlag, "dist": dist, "ngood": 10},
+        params={"dt": dt, "maxlag": maxlag, "dist": dist, "ngood": 10},
         data=np.random.random(n).astype(np.float32),
     )
 
