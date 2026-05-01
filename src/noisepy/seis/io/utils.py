@@ -141,7 +141,7 @@ def get_results(
     def pbar_update(_: Future):
         mem_mb = psutil.Process().memory_info().rss / (1024 * 1024)
         pbar.update(1)
-        pbar.set_description(f"{task_name:<23} | Memory: {mem_mb:5.0f} MB")
+        pbar.set_description(f"{task_name:<19} | Memory: {mem_mb:5.0f} MB")
 
     # Show a progress bar when processing futures
     with logging_redirect_tqdm():

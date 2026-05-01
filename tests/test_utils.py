@@ -6,7 +6,7 @@ from fsspec.implementations.http import HTTPFileSystem
 from fsspec.implementations.local import LocalFileSystem
 from s3fs import S3FileSystem
 
-from noisepy.seis.io.utils import fs_join, get_filesystem, get_fs_sep, remove_nan_rows, unstack
+from noisepy.seis.io.utils import error_if, fs_join, get_filesystem, get_fs_sep, remove_nan_rows, unstack
 
 SEP = os.path.sep
 paths = [
@@ -52,3 +52,13 @@ def test_remove_nan_rows():
     a = np.array([[1, 2, 3], [4, 5, 6], [np.nan, np.nan, np.nan]])
     b = remove_nan_rows(a)
     assert np.all(b == np.array([[1, 2, 3], [4, 5, 6]]))
+
+
+def test_error_if():
+    error_if(False, "should not raise")
+
+    with pytest.raises(RuntimeError, match="boom"):
+        error_if(True, "boom")
+
+    with pytest.raises(ValueError, match="bad value"):
+        error_if(True, "bad value", ValueError)

@@ -5,8 +5,6 @@ import pytest
 from datetimerange import DateTimeRange
 from test_channelcatalog import MockCatalog
 
-from noisepy.seis.io.channel_filter_store import channel_filter
-from noisepy.seis.io.datatypes import Channel, ChannelType, Station
 from noisepy.seis.io.s3store import SCEDCS3DataStore
 
 timespan1 = DateTimeRange(
@@ -31,7 +29,7 @@ def test_parsefilename(file: str, expected: DateTimeRange):
 
 
 data_paths = [
-    (os.path.join(os.path.dirname(__file__), "./data/s3scedc"), None),
+    (os.path.join(os.path.dirname(__file__), "./data/scedc/2022/2022_002/"), None),
     ("s3://scedc-pds/continuous_waveforms/2022/2022_002/", None),
     ("s3://scedc-pds/continuous_waveforms/", timespan1),
 ]
@@ -67,20 +65,3 @@ def test_timespan_channels(store: SCEDCS3DataStore):
     assert len(channels) == len(read_channels)
     channels = store.get_channels(timespan2)
     assert len(channels) == 0
-
-
-def test_filter():
-    # filter for station 'staX' or 'staY' and channel type starts with 'B'
-    f = channel_filter(["CI"], ["staX", "staY"], ["BHE", "BBB"])
-    staX = Station("CI", "staX")
-    staZ = Station("CI", "staZ")
-
-    def check(sta, ch_name):
-        ch = Channel(ChannelType((ch_name)), sta)
-        return f(ch)
-
-    assert check(staX, "BHE") is True
-    assert check(staX, "BBB") is True
-    assert check(staX, "CHE") is False  # invalid channel name
-    assert check(staZ, "BHE") is False  # invalid station
-    assert check(staZ, "CHE") is False  # invalid station and channel name

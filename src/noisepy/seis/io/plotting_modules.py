@@ -23,8 +23,8 @@ by Chengxin Jiang @Harvard (May.04.2019)
 
 Specifically, this plotting module includes functions of:
     1) plot_waveform     -> display the downloaded waveform for specific station
-    2) plot_substack_cc  -> plot 2D matrix of the CC functions for one time-chunck (e.g., 2 days)
-    3) plot_substack_all -> plot 2D matrix of the CC functions for all time-chunck (e.g., every 1 day in 1 year)
+    2) plot_substack_cc  -> plot 2D matrix of the CC functions for one time-chunk (e.g., 2 days)
+    3) plot_substack_all -> plot 2D matrix of the CC functions for all time-chunk (e.g., every 1 day in 1 year)
     4) plot_all_moveout  -> plot the moveout of the stacked CC functions for all time-chunk
 """
 
@@ -45,7 +45,7 @@ def plot_waveform(
     net,sta,comp: network, station name and component
     freqmin: min frequency to be filtered
     freqmax: max frequency to be filtered
-    savefg: Whether to save the figures as a PDF on disk
+    savefig: Whether to save the figures as a PDF on disk
     sdir: Save directory
 
     USAGE:
@@ -144,16 +144,16 @@ def plot_substack_cc(
     sdir="./",
 ):
     """
-    display the 2D matrix of the cross-correlation functions for a certain time-chunck.
+    display the 2D matrix of the cross-correlation functions for a certain time-chunk.
 
     PARAMETERS:
     --------------------------
     cc_store: Store to read CC data from
-    ts: Timespan to ploe
+    ts: Timespan to plot
     freqmin: min frequency to be filtered
     freqmax: max frequency to be filtered
     disp_lag: time ranges for display
-    savefg: Whether to save the figures as a PDF on disk
+    savefig: Whether to save the figures as a PDF on disk
     sdir: Save directory
 
     Note: IMPORTANT!!!! this script only works for cross-correlation with sub-stacks being set to True in S1.
@@ -185,7 +185,7 @@ def plot_substack_cc(
     if not disp_lag:
         disp_lag = maxlag
     if disp_lag > maxlag:
-        raise ValueError("lag excceds maxlag!")
+        raise ValueError("lag exceeds maxlag!")
 
     # t is the time labels for plotting
     t = np.arange(-int(disp_lag), int(disp_lag) + dt, step=int(2 * int(disp_lag) / 4))
@@ -266,11 +266,11 @@ def plot_substack_cc(
 
 def plot_substack_cc_spect(sfile, freqmin, freqmax, disp_lag=None, savefig=True, sdir="./"):
     """
-    display the 2D matrix of the cross-correlation functions for a time-chunck.
+    display the 2D matrix of the cross-correlation functions for a time-chunk.
 
     PARAMETERS:
     -----------------------
-    sfile: cross-correlation functions outputed by S1
+    sfile: cross-correlation functions output by S1
     freqmin: min frequency to be filtered
     freqmax: max frequency to be filtered
     disp_lag: time ranges for display
@@ -305,7 +305,7 @@ def plot_substack_cc_spect(sfile, freqmin, freqmax, disp_lag=None, savefig=True,
     if not disp_lag:
         disp_lag = maxlag
     if disp_lag > maxlag:
-        raise ValueError("lag excceds maxlag!")
+        raise ValueError("lag exceeds maxlag!")
     t = np.arange(-int(disp_lag), int(disp_lag) + dt, step=int(2 * int(disp_lag) / 4))
     indx1 = int((maxlag - disp_lag) / dt)
     indx2 = indx1 + 2 * int(disp_lag / dt) + 1
@@ -417,7 +417,7 @@ def plot_substack_all(
 
     PARAMETERS:
     ---------------------
-    sfile: cross-correlation functions outputed by S2
+    sfile: cross-correlation functions output by S2
     freqmin: min frequency to be filtered
     freqmax: max frequency to be filtered
     disp_lag: time ranges for display
@@ -450,7 +450,7 @@ def plot_substack_all(
     if not disp_lag:
         disp_lag = maxlag
     if disp_lag > maxlag:
-        raise ValueError("lag excceds maxlag!")
+        raise ValueError("lag exceeds maxlag!")
     t = np.arange(-int(disp_lag), int(disp_lag) + dt, step=int(2 * int(disp_lag) / 4))
     indx1 = int((maxlag - disp_lag) / dt)
     indx2 = indx1 + 2 * int(disp_lag / dt) + 1
@@ -538,7 +538,7 @@ def plot_substack_all_spect(
 
     PARAMETERS:
     -----------------------
-    sfile: cross-correlation functions outputed by S2
+    sfile: cross-correlation functions output by S2
     freqmin: min frequency to be filtered
     freqmax: max frequency to be filtered
     disp_lag: time ranges for display
@@ -571,7 +571,7 @@ def plot_substack_all_spect(
     if not disp_lag:
         disp_lag = maxlag
     if disp_lag > maxlag:
-        raise ValueError("lag excceds maxlag!")
+        raise ValueError("lag exceeds maxlag!")
     t = np.arange(-int(disp_lag), int(disp_lag) + dt, step=int(2 * int(disp_lag) / 4))
     indx1 = int((maxlag - disp_lag) / dt)
     indx2 = indx1 + 2 * int(disp_lag / dt) + 1
@@ -698,13 +698,13 @@ def plot_all_moveout(
 
     dt, maxlag = (params[p] for p in ["dt", "maxlag"])
     stack_method = stack_name.split("0")[-1]
-    logger.info(f"Plottting: {stack_method}, {len(sta_stacks)} station pairs")
+    logger.info(f"Plotting {len(sta_stacks)} pairs from {stack_method}")
 
     # lags for display
     if not disp_lag:
         disp_lag = maxlag
     if disp_lag > maxlag:
-        raise ValueError("lag excceds maxlag!")
+        raise ValueError("lag exceeds maxlag!")
     t = np.arange(-int(disp_lag), int(disp_lag) + dt, step=(int(2 * int(disp_lag) / 4)))
     indx1 = int((maxlag - disp_lag) / dt)
     indx2 = indx1 + 2 * int(disp_lag / dt) + 1
@@ -802,9 +802,9 @@ def plot_all_moveout_1D_1comp(
 
     PARAMETERS:
     ---------------------
-    sfile: cross-correlation functions outputed by S2
+    sfile: cross-correlation functions output by S2
     sta: source station name
-    dtype: datatype either 'Allstack0pws' or 'Allstack0linear'
+    dtype: datatype either 'Allstack_pws' or 'Allstack_linear'
     freqmin: min frequency to be filtered
     freqmax: max frequency to be filtered
     ccomp:   cross component
@@ -814,7 +814,7 @@ def plot_all_moveout_1D_1comp(
 
     USAGE:
     ----------------------
-    plot_substack_moveout('temp.h5','Allstack0pws',0.1,0.2,'ZZ',200,True,'./temp')
+    plot_substack_moveout('temp.h5','Allstack_pws',0.1,0.2,'ZZ',200,True,'./temp')
     """
     # open data for read
     if savefig:
@@ -836,7 +836,7 @@ def plot_all_moveout_1D_1comp(
     if not disp_lag:
         disp_lag = maxlag
     if disp_lag > maxlag:
-        raise ValueError("lag excceds maxlag!")
+        raise ValueError("lag exceeds maxlag!")
     tt = np.arange(-int(disp_lag), int(disp_lag) + dt, dt)
     indx1 = int((maxlag - disp_lag) / dt)
     indx2 = indx1 + 2 * int(disp_lag / dt) + 1
@@ -907,9 +907,9 @@ def plot_all_moveout_1D_9comp(
 
     PARAMETERS:
     ---------------------
-    sfile: cross-correlation functions outputed by S2
+    sfile: cross-correlation functions output by S2
     sta: source station name
-    dtype: datatype either 'Allstack0pws' or 'Allstack0linear'
+    dtype: datatype either 'Allstack_pws' or 'Allstack_linear'
     freqmin: min frequency to be filtered
     freqmax: max frequency to be filtered
     mdist: maximum inter-station distance to show on plot
@@ -942,7 +942,7 @@ def plot_all_moveout_1D_9comp(
     if not disp_lag:
         disp_lag = maxlag
     if disp_lag > maxlag:
-        raise ValueError("lag excceds maxlag!")
+        raise ValueError("lag exceeds maxlag!")
     tt = np.arange(-int(disp_lag), int(disp_lag) + dt, dt)
     indx1 = int((maxlag - disp_lag) / dt)
     indx2 = indx1 + 2 * int(disp_lag / dt) + 1

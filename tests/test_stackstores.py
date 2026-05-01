@@ -7,7 +7,7 @@ from utils import date_range
 from noisepy.seis.io.asdfstore import ASDFStackStore
 from noisepy.seis.io.datatypes import Stack, Station
 from noisepy.seis.io.numpystore import NumpyStackStore
-from noisepy.seis.io.stores import StackStore
+from noisepy.seis.io.stores import StackStore, convert_stackstore
 from noisepy.seis.io.zarrstore import ZarrStackStore
 
 
@@ -68,3 +68,21 @@ def test_zarrstore(zarrstore: ZarrStackStore):
 
 def test_numpystore(numpystore: NumpyStackStore):
     _stackstore_test_helper(numpystore)
+
+
+def test_convert_stackstore(tmp_path: Path):
+    src_store = NumpyStackStore(str(tmp_path / "src"))
+    dst_store = NumpyStackStore(str(tmp_path / "dst"))
+
+    src = Station("nw", "sta1")
+    rec = Station("nw", "sta2")
+    ts = date_range(4, 1, 2)
+    stacks = [Stack("EE", "Allstack_linear", {}, np.random.random(10))]
+    src_store.append(ts, src, rec, stacks)
+
+    convert_stackstore(src_store, dst_store, ts, src, rec)
+
+    result = dst_store.read(ts, src, rec)
+    assert len(result) == 1
+    assert result[0].component == stacks[0].component
+    assert np.all(result[0].data == stacks[0].data)

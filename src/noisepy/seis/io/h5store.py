@@ -130,11 +130,11 @@ class DASH5DataStore(RawDataStore):
         data = ChannelData(stream)
         return data
 
-    def _parse_channel(self, cha_numebr: int) -> Channel:
-        cha_numebr = str(cha_numebr).zfill(5)
+    def _parse_channel(self, cha_number: int) -> Channel:
+        cha_number = str(cha_number).zfill(5)
         return Channel(
             ChannelType("XXZ"),
-            Station(self.array_name, cha_numebr),
+            Station(self.array_name, cha_number),
         )
 
     def _parse_timespan(self, filename: str) -> DateTimeRange:

@@ -62,14 +62,16 @@ class XMLStationChannelCatalog(ChannelCatalog):
     A channel catalog that reads <station>.XML files from a directory or an s3://... bucket url path.
     """
 
-    def __init__(self, xmlpath: str, path_format: str = "{network}_{name}.xml", storage_options={}) -> None:
+    def __init__(
+        self, xmlpath: str, path_format: str = "{network}_{station}.xml", storage_options={}
+    ) -> None:
         """
         Constructs a XMLStationChannelCatalog
 
         Args:
             xmlpath (str): Base directory where to find the files
             path_format (str): Format string to construct the file name from a station.
-                               The argument names are 'network' and 'name'.
+                               The argument names are 'network' and 'station'.
         """
         super().__init__()
         self.xmlpath = xmlpath
@@ -79,7 +81,7 @@ class XMLStationChannelCatalog(ChannelCatalog):
             raise Exception(f"The XML Station file directory '{xmlpath}' doesn't exist")
 
     def get_inventory(self, timespan: DateTimeRange, station: Station) -> obspy.Inventory:
-        file_name = self.path_format.format(network=station.network, name=station.name)
+        file_name = self.path_format.format(network=station.network, station=station.name)
         xmlfile = fs_join(self.xmlpath, file_name)
         return self._get_inventory_from_file(xmlfile)
 
@@ -235,7 +237,7 @@ def stats2inv_staxml(stats, respdir: str) -> obspy.Inventory:
             if len(invfilelist) > 1:
                 logger.warning(
                     (
-                        "Warning! More than one StationXML file was found for station %s."
+                        "More than one StationXML file was found for station %s."
                         + "Keeping the first file in list."
                     )
                     % stats.station

@@ -20,14 +20,19 @@ chan_data = [("ARV", "BHE", 35.1269, -118.83009, 258.0), ("BAK", "BHZ", 35.34444
 file = os.path.join(os.path.dirname(__file__), "./data/station.csv")
 
 
-@pytest.mark.parametrize("stat,ch,lat,lon,elev", chan_data)
-def test_CSVChannelCatalog(stat: str, ch: str, lat: float, lon: float, elev: float):
+@pytest.mark.parametrize("sta,cha,lat,lon,elev", chan_data)
+def test_CSVChannelCatalog(sta: str, cha: str, lat: float, lon: float, elev: float):
     cat = CSVChannelCatalog(file)
-    chan = Channel(ChannelType(ch), Station("CI", stat))
+    chan = Channel(ChannelType(cha), Station("CI", sta))
     full_ch = cat.get_full_channel(DateTimeRange(), chan)
     assert full_ch.station.lat == lat
     assert full_ch.station.lon == lon
     assert full_ch.station.elevation == elev
+
+    inv = cat.get_inventory(None, None)
+    content = inv.get_contents()
+    assert "CI" in content["networks"]
+    assert len(content["channels"]) == len(cat.df)
 
 
 class MockCatalog(ChannelCatalog):
@@ -50,10 +55,10 @@ def test_frominventory(station: str, ch: str, lat: float, lon: float, elev: floa
         sampling_rate = 1.0
         location = "00"
 
-    stat = MockStat()
-    stat.station = station
+    sta = MockStat()
+    sta.station = station
 
-    inv = stats2inv_mseed(stat, df)
+    inv = stats2inv_mseed(sta, df)
     cat = MockCatalog()
     chan = Channel(ChannelType(ch), Station("CI", station))
     full_ch = cat.populate_from_inventory(inv, chan)
@@ -62,8 +67,11 @@ def test_frominventory(station: str, ch: str, lat: float, lon: float, elev: floa
     assert full_ch.station.elevation == elev
 
 
-xmlpaths = [os.path.join(os.path.dirname(__file__), "./data/CI/"), "s3://scedc-pds/FDSNstationXML/CI/"]
-xmlpaths2 = os.path.join(os.path.dirname(__file__), "./data/")
+xmlpaths = [
+    os.path.join(os.path.dirname(__file__), "./data/stationxml/CI/"),
+    "s3://scedc-pds/FDSNstationXML/CI/",
+]
+xmlpaths2 = os.path.join(os.path.dirname(__file__), "./data/stationxml/")
 
 
 @pytest.mark.parametrize("path", xmlpaths)
@@ -78,7 +86,7 @@ def test_XMLStationChannelCatalog(path):
 
 def test_XMLStationChannelCatalogCustomPath():
     # Check that a custom file name is also found properly, e.g. BK/BK.WINE.xml
-    cat = XMLStationChannelCatalog(xmlpaths2, "{network}" + os.path.sep + "{network}.{name}.xml")
+    cat = XMLStationChannelCatalog(xmlpaths2, "{network}/{network}.{station}.xml")
     yaq_inv = cat.get_inventory(DateTimeRange(), Station("BK", "WINE"))
     assert len(yaq_inv) == 1
     assert len(yaq_inv.networks[0].stations) == 1
