@@ -71,13 +71,13 @@ def test_config_dates():
     c = ConfigParameters.model_validate(dict(c), strict=True)
 
 
-def test_save_load_stations():
+def test_save_load_stations(tmp_path: Path):
     c = ConfigParameters()
     c.stations = ["new_station1", "new_station2"]
-    c.save_stations(os.path.join(os.path.dirname(__file__), "./data/stations1.txt"))
+    c.save_stations(os.path.join(tmp_path, "stations1.txt"))
 
     with pytest.raises(ValueError):
-        c.load_stations(os.path.join(os.path.dirname(__file__), "./data/stations0.txt"))
+        c.load_stations(os.path.join(tmp_path, "stations0.txt"))
 
-    c.load_stations(os.path.join(os.path.dirname(__file__), "./data/stations.txt"))
-    assert c.stations == ["RPV", "SVD", "BBR"]
+    c.load_stations(os.path.join(tmp_path, "stations1.txt"))
+    assert c.stations == ["new_station1", "new_station2"]
