@@ -86,7 +86,7 @@ class MiniSeedDataStore(RawDataStore):
             timespan = MiniSeedDataStore._parse_timespan(int(year), int(doy))
             key = str(timespan)
             self.paths[timespan.start_datetime] = full_path
-            channel = self._parse_channel(basename)
+            channel = MiniSeedDataStore._parse_channel(basename)
             if not chan_filter(channel):
                 continue
             if key not in self.channels:
@@ -128,7 +128,7 @@ class MiniSeedDataStore(RawDataStore):
         jan1 = datetime(year, 1, 1, tzinfo=timezone.utc)
         return DateTimeRange(jan1 + timedelta(days=doy - 1), jan1 + timedelta(days=doy))
 
-    def _parse_channel(self, filename: str) -> Channel:
+    def _parse_channel(filename: str) -> Channel:
         network = filename[:2]
         station = filename[2:7].rstrip("_")
         channel = filename[7:10]
