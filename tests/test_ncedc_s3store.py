@@ -52,7 +52,6 @@ def store(request):
 @pytest.mark.parametrize("channel", read_channels)
 def test_read(store: NCEDCS3DataStore, channel: str):
     chdata = store.read_data(timespan1, channel)
-    print(chdata.stream)
     assert chdata.sampling_rate == 1.0
     assert chdata.start_timestamp >= timespan1.start_datetime.timestamp()
     assert chdata.start_timestamp < timespan1.end_datetime.timestamp()

@@ -20,7 +20,7 @@ timespan2 = DateTimeRange(
 
 stores = [
     DASH5DataStore(
-        os.path.join(os.path.dirname(__file__), "./das"),
+        os.path.join(os.path.dirname(__file__), "./data/das"),
         2,
         [0, 1, 2],
         "%Y-%m-%d-%H-%M-%S.h5",
@@ -28,7 +28,7 @@ stores = [
         timespan1,
     ),
     DASH5DataStore(
-        os.path.join(os.path.dirname(__file__), "./das"), 2, [0, 1, 2], "%Y-%m-%d-%H-%M-%S.h5", "DAS", None
+        os.path.join(os.path.dirname(__file__), "./data/das"), 2, [0, 1, 2], "%Y-%m-%d-%H-%M-%S.h5", "DAS", None
     ),
 ]
 
