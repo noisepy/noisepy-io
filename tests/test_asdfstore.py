@@ -10,7 +10,7 @@ from noisepy.seis.io.datatypes import ChannelType
 def store():
     import os
 
-    return ASDFRawDataStore(os.path.join(os.path.dirname(__file__), "./data"))
+    return ASDFRawDataStore(os.path.join(os.path.dirname(__file__), "./data/asdf"))
 
 
 def test_get_timespans(store: ASDFRawDataStore):

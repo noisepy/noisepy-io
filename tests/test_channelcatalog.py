@@ -55,10 +55,10 @@ def test_frominventory(station: str, ch: str, lat: float, lon: float, elev: floa
         sampling_rate = 1.0
         location = "00"
 
-    stat = MockStat()
-    stat.station = station
+    sta = MockStat()
+    sta.station = station
 
-    inv = stats2inv_mseed(stat, df)
+    inv = stats2inv_mseed(sta, df)
     cat = MockCatalog()
     chan = Channel(ChannelType(ch), Station("CI", station))
     full_ch = cat.populate_from_inventory(inv, chan)

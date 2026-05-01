@@ -9,8 +9,8 @@ matplotlib.use("Agg")
 from noisepy.seis.io.datatypes import Stack, Station
 from noisepy.seis.io.plotting_modules import plot_all_moveout, plot_substack_cc, plot_waveform
 
-SRC = Station("nw", "sta1")
-REC = Station("nw", "sta2")
+SRC = Station("UW", "STA1")
+REC = Station("UW", "STA2")
 
 
 def _make_stack(dt=0.05, maxlag=10.0, dist=5.0):

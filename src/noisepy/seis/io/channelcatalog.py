@@ -237,7 +237,7 @@ def stats2inv_staxml(stats, respdir: str) -> obspy.Inventory:
             if len(invfilelist) > 1:
                 logger.warning(
                     (
-                        "Warning! More than one StationXML file was found for station %s."
+                        "More than one StationXML file was found for station %s."
                         + "Keeping the first file in list."
                     )
                     % stats.station

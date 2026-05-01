@@ -80,10 +80,13 @@ class MiniSeedDataStore(RawDataStore):
         doy = doy[-3:]
 
         for i in glob.glob(fs_join(full_path, "*")):
+            basename = os.path.basename(i)
+            if basename.startswith("."):
+                continue
             timespan = MiniSeedDataStore._parse_timespan(int(year), int(doy))
             key = str(timespan)
             self.paths[timespan.start_datetime] = full_path
-            channel = self._parse_channel(os.path.basename(i))
+            channel = self._parse_channel(basename)
             if not chan_filter(channel):
                 continue
             if key not in self.channels:
