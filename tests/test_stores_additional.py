@@ -9,7 +9,13 @@ from utils import date_range
 
 from noisepy.seis.io.datatypes import Channel, ChannelType, Station
 from noisepy.seis.io.pnwstore import PNWDataStore
-from noisepy.seis.io.stores import StackStore, convert_stackstore, parse_station_pair, parse_timespan, timespan_str
+from noisepy.seis.io.stores import (
+    StackStore,
+    convert_stackstore,
+    parse_station_pair,
+    parse_timespan,
+    timespan_str,
+)
 
 
 class _DummyStackStore(StackStore):
