@@ -1,3 +1,6 @@
+import os
+
+
 from datetime import datetime
 
 import pytest
@@ -8,10 +11,11 @@ from noisepy.seis.io.datatypes import ChannelType
 
 @pytest.fixture
 def store():
-    import os
-
     return ASDFRawDataStore(os.path.join(os.path.dirname(__file__), "./data/asdf"))
 
+def test_asdf_mode():
+    with pytest.raises(ValueError):
+        ASDFRawDataStore(os.path.join(os.path.dirname(__file__), "./data/asdf"), mode="w")
 
 def test_get_timespans(store: ASDFRawDataStore):
     ts = store.get_timespans()
@@ -29,6 +33,13 @@ def test_get_channels(store: ASDFRawDataStore):
     assert str(chans[0].type) == "bhn_00"
     assert chans[0].station.name == "BAK"
 
+def test_get_inventory(store: ASDFRawDataStore):
+    ts = store.get_timespans()[0]
+    chan = store.get_channels(ts)[0]
+    inv = store.get_inventory(ts, chan.station)
+    assert len(inv) == 1
+    assert inv[0].code == "CI"
+    assert inv[0][0].code == "BAK"
 
 def test_get_data(store: ASDFRawDataStore):
     ts = store.get_timespans()[0]

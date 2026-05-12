@@ -15,9 +15,16 @@ def test_location_filtering():
     channels = store.get_channels(timespan1)
     assert len(channels) == 4
     filter_store = LocationChannelFilterStore(store)
-    # This should filter out the BKTHIS_LHZ10 channel and leave the BKTHIS_LHZ00 channel
+
+    ts = filter_store.get_timespans()
+    assert len(ts) == 1
+
     channels = filter_store.get_channels(timespan1)
     assert len(channels) == 3
+
+    data = filter_store.read_data(ts[0], channels[0]).data
+    assert data.shape == (86400, )
+    
     bkthis_chan = next(filter(lambda c: c.station.network == "BK", channels))
     assert bkthis_chan.type.location == "00"
 
