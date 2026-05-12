@@ -23,8 +23,8 @@ def test_location_filtering():
     assert len(channels) == 3
 
     data = filter_store.read_data(ts[0], channels[0]).data
-    assert data.shape == (86400, )
-    
+    assert data.shape == (86400,)
+
     bkthis_chan = next(filter(lambda c: c.station.network == "BK", channels))
     assert bkthis_chan.type.location == "00"
 
