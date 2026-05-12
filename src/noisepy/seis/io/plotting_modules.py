@@ -460,14 +460,14 @@ def plot_substack_all(
     nwin = len(dtype_lists) - num_stacks
     data = np.zeros(shape=(nwin, indx2 - indx1), dtype=np.float32)
     ngood = np.zeros(nwin, dtype=np.int16)
-    ttime = np.zeros(nwin, dtype=np.int)
+    ttime = np.zeros(nwin, dtype=np.int16)
     timestamp = np.empty(ttime.size, dtype="datetime64[s]")
     amax = np.zeros(nwin, dtype=np.float32)
 
     for ii, itype in enumerate(dtype_lists[num_stacks:]):
         if "Allstack" in itype:
             continue
-        timestamp[ii] = obspy.UTCDateTime(np.float(itype[1:]))
+        timestamp[ii] = obspy.UTCDateTime(np.float32(itype[1:]))
         try:
             ngood[ii] = ds.auxiliary_data[itype][paths].parameters["ngood"]
             ttime[ii] = ds.auxiliary_data[itype][paths].parameters["time"]
@@ -584,14 +584,14 @@ def plot_substack_all_spect(
     data = np.zeros(shape=(nwin, indx2 - indx1), dtype=np.float32)
     spec = np.zeros(shape=(nwin, nfft // 2), dtype=np.complex64)
     ngood = np.zeros(nwin, dtype=np.int16)
-    ttime = np.zeros(nwin, dtype=np.int)
+    ttime = np.zeros(nwin, dtype=np.int16)
     timestamp = np.empty(ttime.size, dtype="datetime64[s]")
     amax = np.zeros(nwin, dtype=np.float32)
 
     for ii, itype in enumerate(dtype_lists[num_stacks:]):
         if "stack" in itype:
             continue
-        timestamp[ii] = obspy.UTCDateTime(np.float(itype[1:]))
+        timestamp[ii] = obspy.UTCDateTime(np.float32(itype[1:]))
         try:
             ngood[ii] = ds.auxiliary_data[itype][paths].parameters["ngood"]
             ttime[ii] = ds.auxiliary_data[itype][paths].parameters["time"]

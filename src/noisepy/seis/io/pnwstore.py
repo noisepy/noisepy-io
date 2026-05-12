@@ -75,7 +75,7 @@ class PNWDataStore(RawDataStore):
         if net != "__":
             cmd += f" AND network = '{net}'"
         else:
-            logging.warning("Data path contains wildcards. Channel query might be slow.")
+            logger.warning("Data path contains wildcards. Channel query might be slow.")
         rst = self._dbquery(cmd)
         for i in rst:
             timespan = PNWDataStore._parse_timespan(os.path.basename(i[4]))
