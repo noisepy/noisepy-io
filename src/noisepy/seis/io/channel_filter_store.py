@@ -1,12 +1,16 @@
-import re
-from typing import Callable, List
+from __future__ import annotations
 
-import obspy
+import re
+from typing import TYPE_CHECKING, Callable, List
+
 from datetimerange import DateTimeRange
 
 from .constants import WILD_CARD_ANY, WILD_CARD_SINGLE
 from .datatypes import Channel, ChannelData, Station
 from .stores import RawDataStore
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    import obspy
 
 
 class LocationChannelFilterStore(RawDataStore):

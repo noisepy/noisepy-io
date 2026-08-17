@@ -1,10 +1,14 @@
-from typing import Dict, List
+from __future__ import annotations
 
-import obspy
+from typing import TYPE_CHECKING, Dict, List
+
 from datetimerange import DateTimeRange
 
 from .datatypes import Channel, ChannelData, Station
 from .stores import RawDataStore
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    import obspy
 
 
 class CompositeRawStore(RawDataStore):

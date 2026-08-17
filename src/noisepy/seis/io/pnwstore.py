@@ -1,18 +1,22 @@
+from __future__ import annotations
+
 import io
 import logging
 import os
 import sqlite3
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
-from typing import Callable, List, Tuple
+from typing import TYPE_CHECKING, Callable, List, Tuple
 
-import obspy
 from datetimerange import DateTimeRange
 
 from .channelcatalog import ChannelCatalog
 from .datatypes import Channel, ChannelData, ChannelType, Station
 from .stores import RawDataStore
 from .utils import fs_join, get_filesystem
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    import obspy
 
 logger = logging.getLogger(__name__)
 
@@ -131,6 +135,8 @@ class PNWDataStore(RawDataStore):
         if not self.fs.exists(filename):
             logger.warning(f"Could not find file {filename}")
             return ChannelData.empty()
+
+        import obspy  # miniSEED read; obspy extra
 
         stream = obspy.Stream()
         with self.fs.open(filename, "rb") as f:

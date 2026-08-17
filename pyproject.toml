@@ -25,7 +25,6 @@ dependencies = [
     "DateTimeRange>=2.0.0,<3.0.0",
     "numpy>=1.22.0,<2.0.0",
     "pandas>=1.5.3,<2.0.0",
-    "pyasdf>=0.7.5,<1.0.0",
     "fsspec>=2023.4.0,<2024.0.0",
     "s3fs==2023.4.0,<2024.0.0",
     "zarr==2.14.2",
@@ -36,12 +35,30 @@ dependencies = [
     "numcodecs<0.16.0",
     "tqdm",
     "diskcache",
+    # miniSEED decoding, S3/FDSN routing and station metadata. Replaces both
+    # obspy.read and this package's hard-coded archive layouts; see
+    # seisfetchstore.py. Needs the 0.4.1 boto3>=1.26 relax to co-exist with
+    # the s3fs==2023.4.0 pin above.
+    "seisfetch>=0.4.1",
 ]
-# On a mac, install optional dependencies with `pip install '.[dev]'` (include the single quotes)
+# obspy and pyasdf are no longer required to read raw data or compute CCFs:
+# every import of them is lazy (inside the function that needs them), so a
+# rm_resp=NO pipeline on a seisfetch store never loads either one.
 [project.optional-dependencies]
+# instrument response removal (rm_resp != NO), StationXML catalogs, and the
+# obspy-backed stores (mseedstore, s3store, pnwstore, DAS h5store)
+obspy = [
+    "obspy>=1.4",
+]
+# ASDF input/output. pyasdf pulls obspy in transitively.
+asdf = [
+    "pyasdf>=0.7.5,<1.0.0",
+]
 dev = [
     "pytest",
     "pytest-cov", # Used to report total code coverage
+    "obspy>=1.4", # the obspy-backed stores are still tested
+    "pyasdf>=0.7.5,<1.0.0", # ASDF store tests
     "pre-commit", # Used to run checks before finalizing a git commit
     "sphinx", # Used to automatically generate documentation
     "sphinx-rtd-theme", # Used to render documentation
