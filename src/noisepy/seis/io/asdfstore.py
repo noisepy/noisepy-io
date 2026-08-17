@@ -1,12 +1,12 @@
+from __future__ import annotations
+
 import glob
 import logging
 import os
 from pathlib import Path
-from typing import Callable, Dict, Generic, List, Optional, Set, Tuple, TypeVar
+from typing import TYPE_CHECKING, Callable, Dict, Generic, List, Optional, Set, Tuple, TypeVar
 
 import numpy as np
-import obspy
-import pyasdf
 from datetimerange import DateTimeRange
 
 from . import channelcatalog
@@ -20,6 +20,10 @@ from .stores import (
     parse_timespan,
     timespan_str,
 )
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    import obspy
+    import pyasdf
 
 logger = logging.getLogger(__name__)
 
@@ -231,7 +235,11 @@ class ASDFStackStore(StackStore):
         return stacks
 
 
-def _get_dataset(filename: str, mode: str) -> pyasdf.ASDFDataSet:
+def _get_dataset(filename: str, mode: str) -> "pyasdf.ASDFDataSet":
+    # pyasdf (and the obspy it pulls in) is the ASDF extra: importing this
+    # module must not require it, only calling into ASDF I/O does
+    import pyasdf
+
     logger.debug(f"Opening {filename}")
     if os.path.exists(filename):
         return pyasdf.ASDFDataSet(filename, mode=mode, mpi=False, compression=None)

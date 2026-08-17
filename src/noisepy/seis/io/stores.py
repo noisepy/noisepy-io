@@ -1,17 +1,21 @@
+from __future__ import annotations
+
 import datetime
 import logging
 import os
 import re
 from abc import ABC, abstractmethod
 from concurrent.futures import Executor, ThreadPoolExecutor
-from typing import Generic, List, Optional, Tuple, TypeVar
+from typing import TYPE_CHECKING, Generic, List, Optional, Tuple, TypeVar
 
-import obspy
 from datetimerange import DateTimeRange
 
 from .constants import DATE_FORMAT
 from .datatypes import AnnotatedData, Channel, ChannelData, CrossCorrelation, Stack, Station
 from .utils import TimeLogger, get_results
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    import obspy
 
 
 class DataStore(ABC):
@@ -123,7 +127,14 @@ def parse_timespan(filename: str) -> Optional[DateTimeRange]:
     parts = os.path.splitext(os.path.basename(filename))[0].split("T")
     if parts is None or len(parts) != 2:
         return None
-    dates = [obspy.UTCDateTime(p).datetime.replace(tzinfo=datetime.timezone.utc) for p in parts]
+    # exact inverse of timespan_str() above; strptime instead of
+    # obspy.UTCDateTime so reading computed data never pulls in obspy
+    try:
+        dates = [
+            datetime.datetime.strptime(p, DATE_FORMAT).replace(tzinfo=datetime.timezone.utc) for p in parts
+        ]
+    except ValueError:
+        return None
     return DateTimeRange(dates[0], dates[1])
 
 

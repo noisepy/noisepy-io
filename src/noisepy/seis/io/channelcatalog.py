@@ -1,21 +1,23 @@
+from __future__ import annotations
+
 import glob
 import logging
 import os
 import time
 from abc import ABC, abstractmethod
 from functools import lru_cache
+from typing import TYPE_CHECKING
 
 import diskcache as dc
 import numpy as np
-import obspy
-import obspy.core.inventory as inventory
 import pandas as pd
 from datetimerange import DateTimeRange
-from obspy import read_inventory
-from obspy.clients.fdsn import Client
 
 from .datatypes import Channel, Station
 from .utils import fs_join, get_filesystem
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    import obspy
 
 logger = logging.getLogger(__name__)
 
@@ -87,6 +89,9 @@ class XMLStationChannelCatalog(ChannelCatalog):
 
     @lru_cache(maxsize=None)
     def _get_inventory_from_file(self, xmlfile):
+        import obspy
+        from obspy import read_inventory
+
         if not self.fs.exists(xmlfile):
             logger.warning(f"Could not find StationXML file {xmlfile}. Returning empty Inventory()")
             return obspy.Inventory()
@@ -126,7 +131,11 @@ class FDSNChannelCatalog(ChannelCatalog):
         return self._get_inventory(station)
 
     @lru_cache
-    def _get_inventory(self, station: Station) -> obspy.Inventory:
+    def _get_inventory(self, station: Station) -> "obspy.Inventory":
+        import obspy
+        import obspy.clients.fdsn.header  # noqa: F401  (exception type below)
+        from obspy.clients.fdsn import Client
+
         inventory = self.cache.get(str(station), None)  # check local cache
         if inventory is None:
             logging.info(f"Inventory not found in cache for '{station}'. Fetching from {self.url_key}.")
@@ -172,6 +181,9 @@ class CSVChannelCatalog(ChannelCatalog):
 
     def get_inventory(self, timespan: DateTimeRange, station: Station) -> obspy.Inventory:
         # Build a obspy.Inventory from the dataframe
+        import obspy
+        import obspy.core.inventory as inventory
+
         network_codes = list(self.df["network"].unique())
         df = self.df
         nets = []
@@ -227,7 +239,10 @@ def sta_info_from_inv(inv: obspy.Inventory):
     return sta, net, lon, lat, elv, location
 
 
-def stats2inv_staxml(stats, respdir: str) -> obspy.Inventory:
+def stats2inv_staxml(stats, respdir: str) -> "obspy.Inventory":
+    import obspy
+    import obspy.core.inventory as inventory  # noqa: F401
+
     if not respdir:
         raise ValueError("Abort! staxml is selected but no directory is given to access the files")
     else:
@@ -250,6 +265,9 @@ def stats2inv_staxml(stats, respdir: str) -> obspy.Inventory:
 
 
 def stats2inv_sac(stats):
+    import obspy
+    import obspy.core.inventory as inventory
+
     inv = obspy.Inventory(networks=[], source="homegrown")
     net = inventory.Network(
         # This is the network code according to the SEED standard.
@@ -294,7 +312,10 @@ def stats2inv_sac(stats):
     return inv
 
 
-def stats2inv_mseed(stats, locs: pd.DataFrame) -> obspy.Inventory:
+def stats2inv_mseed(stats, locs: pd.DataFrame) -> "obspy.Inventory":
+    import obspy
+    import obspy.core.inventory as inventory
+
     inv = obspy.Inventory(networks=[], source="homegrown")
     ista = locs[locs["station"] == stats.station].index.values.astype("int64")[0]
 
@@ -363,7 +384,10 @@ def cc_parameters(cc_para, coor, tcorr, ncorr, comp):
     substack = cc_para["substack"]
     cc_method = cc_para["cc_method"]
 
-    dist, azi, baz = obspy.geodetics.base.gps2dist_azimuth(latS, lonS, latR, lonR)
+    from seisfetch.contrib.obspy_ports import gps2dist_azimuth_np
+
+    # bit-identical port of obspy.geodetics.base.gps2dist_azimuth
+    dist, azi, baz = gps2dist_azimuth_np(latS, lonS, latR, lonR)
     parameters = {
         "dt": dt,
         "maxlag": int(maxlag),

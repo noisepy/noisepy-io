@@ -1,16 +1,20 @@
+from __future__ import annotations
+
 import logging
 import os
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
-from typing import List
+from typing import TYPE_CHECKING, List
 
 import h5py
-import obspy
 from datetimerange import DateTimeRange
 
 from .datatypes import Channel, ChannelData, ChannelType, Station
 from .stores import RawDataStore
 from .utils import TimeLogger, fs_join, get_filesystem
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    import obspy
 
 logger = logging.getLogger(__name__)
 
@@ -117,6 +121,8 @@ class DASH5DataStore(RawDataStore):
             logger.warning(f"Could not find file {filename}")
             return ChannelData.empty()
 
+        import obspy  # DAS h5 -> Trace; obspy extra
+
         with h5py.File(filename, "r") as f:
             data = f["/Acquisition/Raw[0]/RawData"][:, number]
             starttime = f["/Acquisition/Raw[0]/RawDataTime"][0] / 1e6
@@ -154,6 +160,8 @@ class DASH5DataStore(RawDataStore):
         station.lon = 0.0
         station.elevation = 0.0
 
-    def get_inventory(self, ts, station) -> obspy.Inventory:
+    def get_inventory(self, ts, station) -> "obspy.Inventory":
         # return an empty inventory
+        import obspy
+
         return obspy.Inventory()

@@ -11,7 +11,6 @@ from typing import Any, DefaultDict, Dict, List, Optional, Tuple
 from urllib.parse import urlparse
 
 import numpy as np
-import obspy
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic.functional_validators import model_validator
 from pydantic_yaml import parse_yaml_raw_as, to_yaml_str
@@ -315,29 +314,145 @@ class Channel:
         return f"{self.station}.{self.type}"
 
 
+@dataclass
+class TraceSegment:
+    """
+    One gap-free run of samples, with the metadata the pre-processing chain needs.
+
+    The array-backed equivalent of an ``obspy.Trace``: a store that reads
+    miniSEED without obspy (see :mod:`noisepy.seis.io.seisfetchstore`) produces
+    these directly, and an obspy-backed store converts its traces into them.
+    Times are epoch seconds; ``start_timestamp`` is the time of the FIRST
+    sample, matching ``Trace.stats.starttime.timestamp``.
+    """
+
+    data: np.ndarray
+    sampling_rate: float
+    start_timestamp: float
+    id: str = ""
+
+    @property
+    def npts(self) -> int:
+        return int(self.data.shape[0])
+
+    @property
+    def end_timestamp(self) -> float:
+        """Time of the LAST sample, matching obspy's ``Trace.stats.endtime``."""
+        if self.npts == 0 or self.sampling_rate == 0:
+            return self.start_timestamp
+        return self.start_timestamp + (self.npts - 1) / self.sampling_rate
+
+    @staticmethod
+    def from_trace(trace) -> TraceSegment:
+        return TraceSegment(
+            data=trace.data,
+            sampling_rate=float(trace.stats.sampling_rate),
+            start_timestamp=float(trace.stats.starttime.timestamp),
+            id=trace.id,
+        )
+
+    def to_trace(self):
+        """Build an ``obspy.Trace``. Imports obspy — callers must hold the extra."""
+        import obspy
+
+        net, sta, loc, cha = (self.id.split(".") + ["", "", "", ""])[:4] if self.id else ("", "", "", "")
+        return obspy.Trace(
+            data=self.data,
+            header={
+                "network": net,
+                "station": sta,
+                "location": loc,
+                "channel": cha,
+                "sampling_rate": self.sampling_rate,
+                "starttime": obspy.UTCDateTime(self.start_timestamp),
+            },
+        )
+
+
 class ChannelData:
     """
     A 1D time series of channel data
 
     Attributes:
-        data: series values
+        data: series values (the first segment's samples; the pre-processing
+            chain merges ``segments`` itself)
         sampling_rate: In HZ
         start_timestamp: Seconds since 01/01/1970
+        segments: the gap-free runs this channel is made of
+
+    The class is array-backed: ``stream`` is a lazily built obspy compatibility
+    view, so a pipeline that never touches ``.stream`` never imports obspy.
+    Construct from an obspy Stream (``ChannelData(stream)``) or without obspy
+    (``ChannelData.from_segments`` / ``ChannelData.from_array``).
     """
 
-    stream: obspy.Stream
     data: np.ndarray
-    sampling_rate: int
+    sampling_rate: float
     start_timestamp: float
+    segments: List[TraceSegment]
 
+    @staticmethod
     def empty() -> ChannelData:
-        return ChannelData(obspy.Stream([obspy.Trace(np.empty(0))]))
+        return ChannelData.from_array(np.empty(0), 0.0, 0.0)
 
-    def __init__(self, stream: obspy.Stream):
-        self.stream = stream
+    def __init__(self, stream=None):
+        # Constructing from an obspy Stream stays supported (obspy-backed
+        # stores and every existing caller); the classmethods below are the
+        # obspy-free entry points. obspy is NOT imported here — a Stream that
+        # was handed to us was built by a caller that already had it.
+        self._stream = stream
+        if stream is None or len(stream) == 0:
+            self.segments = []
+            self.data = np.empty(0)
+            self.sampling_rate = 0.0
+            self.start_timestamp = 0.0
+            return
+        self.segments = [TraceSegment.from_trace(tr) for tr in stream]
         self.data = stream[0].data[:]
         self.sampling_rate = stream[0].stats.sampling_rate
         self.start_timestamp = stream[0].stats.starttime.timestamp
+
+    @classmethod
+    def from_segments(cls, segments: List[TraceSegment]) -> ChannelData:
+        ch = cls.__new__(cls)
+        ch._stream = None
+        ch.segments = list(segments)
+        if not ch.segments:
+            ch.data = np.empty(0)
+            ch.sampling_rate = 0.0
+            ch.start_timestamp = 0.0
+        else:
+            first = ch.segments[0]
+            ch.data = first.data
+            ch.sampling_rate = first.sampling_rate
+            ch.start_timestamp = first.start_timestamp
+        return ch
+
+    @classmethod
+    def from_array(
+        cls, data: np.ndarray, sampling_rate: float, start_timestamp: float, id: str = ""
+    ) -> ChannelData:
+        return cls.from_segments(
+            [TraceSegment(data=data, sampling_rate=sampling_rate, start_timestamp=start_timestamp, id=id)]
+        )
+
+    @property
+    def id(self) -> str:
+        return self.segments[0].id if self.segments else ""
+
+    @property
+    def stream(self):
+        """
+        obspy compatibility view, built on first access.
+
+        Kept for callers that still want a Stream (plotting, ASDF output, the
+        ``rm_resp != NO`` pre-processing path). Requires the ``obspy`` extra.
+        """
+        if self._stream is None:
+            import obspy
+
+            self._stream = obspy.Stream([s.to_trace() for s in self.segments])
+        return self._stream
 
 
 @dataclass

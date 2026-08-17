@@ -1,10 +1,11 @@
+from __future__ import annotations
+
 import glob
 import logging
 import os
 from datetime import datetime, timedelta, timezone
-from typing import Callable, List
+from typing import TYPE_CHECKING, Callable, List
 
-import obspy
 from datetimerange import DateTimeRange
 from tqdm.autonotebook import tqdm
 
@@ -12,6 +13,9 @@ from .channelcatalog import ChannelCatalog
 from .datatypes import Channel, ChannelData, ChannelType, Station
 from .stores import RawDataStore
 from .utils import fs_join, get_filesystem
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    import obspy
 
 logger = logging.getLogger(__name__)
 
@@ -118,6 +122,8 @@ class MiniSeedDataStore(RawDataStore):
 
     def read_data(self, timespan: DateTimeRange, chan: Channel) -> ChannelData:
         filename = fs_join(self.paths[timespan.start_datetime], self.get_filename(timespan, chan))
+        import obspy  # miniSEED read; obspy extra
+
         stream = obspy.read(filename)
         return ChannelData(stream)
 

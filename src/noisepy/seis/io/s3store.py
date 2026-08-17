@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import os
 import re
@@ -5,15 +7,17 @@ from abc import abstractmethod
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
-from typing import Callable, List
+from typing import TYPE_CHECKING, Callable, List
 
-import obspy
 from datetimerange import DateTimeRange
 
 from .channelcatalog import ChannelCatalog
 from .datatypes import Channel, ChannelData, ChannelType, Station
 from .stores import RawDataStore
 from .utils import TimeLogger, fs_join, get_filesystem
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    import obspy
 
 logger = logging.getLogger(__name__)
 
@@ -115,6 +119,8 @@ class MiniSeedS3DataStore(RawDataStore):
         if not self.fs.exists(filename):
             logger.warning(f"Could not find file {filename}")
             return ChannelData.empty()
+
+        import obspy  # miniSEED read; obspy extra
 
         with self.fs.open(filename) as f:
             stream = obspy.read(f)
