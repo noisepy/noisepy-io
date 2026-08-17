@@ -166,6 +166,12 @@ class TestSeisfetchRawDataStore:
         with pytest.raises(ValueError, match="NET.STA"):
             _store(stations=["PASC"])
 
+    def test_station_spec_with_a_channel_appended_raises(self):
+        # NET.STA.LOC.CHA would otherwise silently drop the channel and read a
+        # different location code than the spec appears to name
+        with pytest.raises(ValueError, match="channel codes are passed separately"):
+            _store(stations=["CI.PASC.00.BHZ"])
+
     def test_timespans_are_utc_days(self):
         store = _store(
             date_range=DateTimeRange(datetime(2022, 1, 2), datetime(2022, 1, 5))
@@ -287,3 +293,36 @@ class TestSeisfetchChannelCatalog:
             full = catalog.get_full_channel(TS, chan)
 
         assert not full.station.valid()
+
+
+class TestInventoryProviderFallback:
+    """get_inventory maps seisfetch's datacenter to an obspy FDSN provider.
+
+    seisfetch adds archives over time (GeoNet arrived in 0.4.0), so the map can
+    fall behind. It must degrade to a warning, not a KeyError.
+    """
+
+    def test_known_datacenters_map_to_providers(self):
+        from noisepy.seis.io.seisfetchstore import FDSN_PROVIDERS
+
+        with patch("seisfetch.s3.route_network", return_value="scedc"):
+            with patch("obspy.clients.fdsn.Client") as client:
+                SeisfetchChannelCatalog().get_inventory(TS, Station("CI", "PASC"))
+        assert client.call_args[0][0] == FDSN_PROVIDERS["scedc"]
+
+    def test_unmapped_datacenter_falls_back_to_iris(self, caplog):
+        with patch("seisfetch.s3.route_network", return_value="a_new_archive"):
+            with patch("obspy.clients.fdsn.Client") as client:
+                SeisfetchChannelCatalog().get_inventory(TS, Station("XX", "SOMEWHERE"))
+        assert client.call_args[0][0] == "IRIS"
+        assert "a_new_archive" in caplog.text
+
+    def test_explicit_provider_wins(self):
+        with patch("obspy.clients.fdsn.Client") as client:
+            SeisfetchChannelCatalog(provider="GEONET").get_inventory(TS, Station("NZ", "WEL"))
+        assert client.call_args[0][0] == "GEONET"
+
+    def test_fdsn_failure_returns_an_empty_inventory(self):
+        with patch("obspy.clients.fdsn.Client", side_effect=RuntimeError("FDSN down")):
+            inv = SeisfetchChannelCatalog().get_inventory(TS, Station("CI", "PASC"))
+        assert len(inv) == 0

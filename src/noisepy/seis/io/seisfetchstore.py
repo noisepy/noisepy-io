@@ -35,6 +35,14 @@ if TYPE_CHECKING:  # pragma: no cover - typing only
 
 logger = logging.getLogger(__name__)
 
+# seisfetch datacenter -> obspy FDSN provider key, for the StationXML path only
+FDSN_PROVIDERS = {
+    "scedc": "SCEDC",
+    "ncedc": "NCEDC",
+    "geonet": "GEONET",
+    "earthscope": "IRIS",
+}
+
 
 def _to_utc(dt: datetime) -> datetime:
     return dt.replace(tzinfo=timezone.utc) if dt.tzinfo is None else dt.astimezone(timezone.utc)
@@ -104,15 +112,20 @@ class SeisfetchChannelCatalog(ChannelCatalog):
         from obspy.clients.fdsn import Client
         from seisfetch.s3 import route_network
 
-        provider = (
-            self.provider
-            or {
-                "scedc": "SCEDC",
-                "ncedc": "NCEDC",
-                "geonet": "GEONET",
-                "earthscope": "IRIS",
-            }[route_network(station.network)]
-        )
+        # seisfetch grows archives over time (GeoNet arrived in 0.4.0), so an
+        # unmapped datacenter is a question of when, not if. Fall back to the
+        # federated IRIS service with a warning rather than raising KeyError:
+        # the caller wants metadata, and IRIS serves most of it.
+        provider = self.provider
+        if provider is None:
+            datacenter = route_network(station.network)
+            provider = FDSN_PROVIDERS.get(datacenter)
+            if provider is None:
+                logger.warning(
+                    f"No FDSN provider mapped for seisfetch datacenter '{datacenter}'; "
+                    "falling back to IRIS. Pass provider= to choose explicitly."
+                )
+                provider = "IRIS"
         try:
             return Client(provider).get_stations(
                 network=station.network,
@@ -163,8 +176,14 @@ class SeisfetchRawDataStore(RawDataStore):
         self.stations = []
         for spec in stations:
             parts = spec.split(".")
-            if len(parts) < 2:
-                raise ValueError(f"Station spec '{spec}' must be NET.STA or NET.STA.LOC")
+            if len(parts) < 2 or len(parts) > 3:
+                # silently ignoring extra fields would read a different
+                # location code than the spec appears to name; a channel
+                # accidentally appended here belongs in `channels`
+                raise ValueError(
+                    f"Station spec '{spec}' must be NET.STA or NET.STA.LOC "
+                    "(channel codes are passed separately, via `channels`)"
+                )
             net, sta = parts[0], parts[1]
             loc = parts[2] if len(parts) > 2 else ""
             self.stations.append(Station(network=net, name=sta, location=loc))
