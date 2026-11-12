@@ -44,3 +44,15 @@ Once you have created a new environment, you can install this project for local 
     ```
 
     Note that `pre-commit install` will initialize pre-commit for this local repository, so that a set of tests will be run prior to completing a local commit. For more information, see the Python Project Template documentation on [pre-commit](https://lincc-ppt.readthedocs.io/en/latest/practices/precommit.html).
+
+## Acknowledgments
+
+noisepy-seis-io was developed as part of the Seismic COmputational Platform for
+Empowering Discovery (SCOPED) project. This material is based upon work
+supported by the U.S. National Science Foundation under Award No. OAC-2103701
+(University of Washington), part of the collaborative SCOPED awards
+OAC-2104052, OAC-2103621, OAC-2103741 and OAC-2103494.
+
+Any opinions, findings, and conclusions or recommendations expressed in this
+material are those of the author(s) and do not necessarily reflect the views
+of the National Science Foundation.
